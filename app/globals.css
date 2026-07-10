@@ -706,6 +706,97 @@ h3 {
   text-orientation: mixed;
 }
 
+.bubble-custom {
+  border-color: var(--accent);
+}
+
+.tok-amt {
+  background: transparent;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.tok-mer {
+  background: transparent;
+  color: var(--fg);
+  border-bottom: 1px dotted var(--accent);
+}
+
+.sms-form {
+  display: flex;
+  gap: 0.375rem;
+  margin-top: 0.875rem;
+}
+
+.sms-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 1px dashed var(--line);
+  color: var(--fg);
+  font-size: 0.625rem;
+  padding: 0.5rem 0.625rem;
+  border-radius: 8px;
+}
+
+.sms-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.sms-input::placeholder {
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+.sms-send {
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 0 0.625rem;
+  cursor: pointer;
+}
+
+.sms-error {
+  margin-top: 0.5rem;
+  font-size: 0.5625rem;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  animation: bubble-in 300ms var(--ease-out);
+}
+
+/* voice wave mic */
+.wave-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.wave-foot .artifact-caption {
+  text-align: left;
+}
+
+.wave-mic {
+  margin-top: 1.5rem;
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 0.5rem 0.875rem;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+
+.wave-mic:hover {
+  background: rgba(165, 118, 59, 0.12);
+}
+
 .ledger-row {
   display: flex;
   justify-content: space-between;

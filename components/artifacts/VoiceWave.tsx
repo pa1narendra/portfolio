@@ -27,6 +27,48 @@ export default function VoiceWave() {
   const rootRef = useRef<HTMLDivElement>(null);
   const boost = useRef(0);
   const [line, setLine] = useState({ qa: 0, phase: 0, chars: 0 }); // phase 0=q 1=a 2=score
+  const [mic, setMic] = useState<"off" | "on" | "denied">("off");
+  const micRef = useRef<{
+    stream: MediaStream;
+    ctx: AudioContext;
+    analyser: AnalyserNode;
+    data: Uint8Array<ArrayBuffer>;
+  } | null>(null);
+
+  const stopMic = () => {
+    const m = micRef.current;
+    if (!m) return;
+    m.stream.getTracks().forEach((t) => t.stop());
+    m.ctx.close();
+    micRef.current = null;
+  };
+
+  const toggleMic = async () => {
+    if (mic === "on") {
+      stopMic();
+      setMic("off");
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const ctx = new AudioContext();
+      const source = ctx.createMediaStreamSource(stream);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 64;
+      source.connect(analyser);
+      micRef.current = {
+        stream,
+        ctx,
+        analyser,
+        data: new Uint8Array(new ArrayBuffer(analyser.frequencyBinCount)),
+      };
+      setMic("on");
+    } catch {
+      setMic("denied");
+    }
+  };
+
+  useEffect(() => stopMic, []);
 
   // waveform
   useEffect(() => {
@@ -58,6 +100,14 @@ export default function VoiceWave() {
     const tick = () => {
       t += 0.035;
       boost.current *= 0.96;
+      // live mic drives the wave when enabled
+      const m = micRef.current;
+      if (m) {
+        m.analyser.getByteFrequencyData(m.data);
+        let sum = 0;
+        for (let i = 0; i < m.data.length; i++) sum += m.data[i];
+        boost.current = Math.max(boost.current, (sum / m.data.length / 255) * 3.2);
+      }
       const r = canvas.getBoundingClientRect();
       const w = r.width;
       const h = r.height;
@@ -141,7 +191,14 @@ export default function VoiceWave() {
         )}
         {showScore && <span className="score-chip mono">{cur.s}</span>}
       </div>
-      <p className="artifact-caption mono">move your cursor over the wave · it listens</p>
+      <div className="wave-foot">
+        <p className="artifact-caption mono">
+          {mic === "on" ? "that's your voice in the wave" : "move your cursor over the wave · it listens"}
+        </p>
+        <button type="button" className="wave-mic mono" onClick={toggleMic}>
+          {mic === "on" ? "■ stop mic" : mic === "denied" ? "mic blocked by browser" : "● test with your real mic"}
+        </button>
+      </div>
     </div>
   );
 }

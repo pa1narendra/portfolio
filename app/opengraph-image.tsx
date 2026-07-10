@@ -16,8 +16,8 @@ export default function OgImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "90px",
-          background: "#0F0E0C",
-          color: "#E9E6DF",
+          background: "linear-gradient(135deg, #ece9f4 0%, #f1f0f5 45%, #f3ece4 100%)",
+          color: "#191820",
           fontFamily: "Arial, sans-serif",
         }}
       >
@@ -25,7 +25,7 @@ export default function OgImage() {
           style={{
             fontSize: 22,
             letterSpacing: 6,
-            color: "#8A857A",
+            color: "#6b6974",
             marginBottom: 28,
             textTransform: "uppercase",
           }}
@@ -43,7 +43,15 @@ export default function OgImage() {
           }}
         >
           <span>I build</span>
-          <span style={{ color: "#C9A36A", fontStyle: "italic", textTransform: "none", fontFamily: "Georgia, serif", fontWeight: 400 }}>
+          <span
+            style={{
+              color: "#a5763b",
+              fontStyle: "italic",
+              textTransform: "none",
+              fontFamily: "Georgia, serif",
+              fontWeight: 400,
+            }}
+          >
             real software.
           </span>
         </div>
@@ -51,13 +59,13 @@ export default function OgImage() {
           style={{
             marginTop: 48,
             paddingTop: 28,
-            borderTop: "1px solid rgba(233,230,223,0.2)",
+            borderTop: "1px solid rgba(25,24,32,0.2)",
             fontSize: 24,
-            color: "#8A857A",
+            color: "#6b6974",
             display: "flex",
           }}
         >
-          mockstar · moneycap · chessing
+          every demo on this page actually runs · chessing · mockstar · moneycap
         </div>
       </div>
     ),

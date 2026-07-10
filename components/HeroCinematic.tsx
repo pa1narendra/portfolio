@@ -35,6 +35,8 @@ export default function HeroCinematic() {
     const el = ref.current;
     if (!el) return;
     const mm = gsap.matchMedia();
+    // returning visitors skip the boot, so the hero shouldn't wait for it
+    const revisit = sessionStorage.getItem("pnp.visited") === "1";
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       const letters = el.querySelectorAll(".hero-h .lt");
@@ -49,14 +51,14 @@ export default function HeroCinematic() {
           duration: 1.15,
           ease: "power4.out",
           stagger: 0.028,
-          delay: 3.35,
+          delay: revisit ? 0.2 : 3.35,
           onComplete: () => el.classList.add("unmasked"),
         },
       );
       gsap.fromTo(
         rest,
         { y: 34, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.9, ease: "power3.out", stagger: 0.12, delay: 3.75 },
+        { y: 0, opacity: 1, duration: 0.9, ease: "power3.out", stagger: 0.12, delay: revisit ? 0.55 : 3.75 },
       );
 
       // scrub-out: pin the hero and let scroll disassemble the headline

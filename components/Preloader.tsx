@@ -87,6 +87,11 @@ export default function Preloader() {
       setPhase("gone");
       return;
     }
+    // full boot + Einstein only once per session; instant entry after
+    if (sessionStorage.getItem("pnp.visited")) {
+      setPhase("gone");
+      return;
+    }
     const t0 = performance.now();
     let raf = 0;
     const tick = () => {
@@ -97,7 +102,10 @@ export default function Preloader() {
     raf = requestAnimationFrame(tick);
     const t1 = setTimeout(() => setPhase("greet"), 1500);
     const t2 = setTimeout(() => setPhase("split"), 3050);
-    const t3 = setTimeout(() => setPhase("gone"), 4050);
+    const t3 = setTimeout(() => {
+      setPhase("gone");
+      sessionStorage.setItem("pnp.visited", "1");
+    }, 4050);
     return () => {
       cancelAnimationFrame(raf);
       clearTimeout(t1);

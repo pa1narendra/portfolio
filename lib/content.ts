@@ -79,7 +79,7 @@ export const projects: Project[] = [
     description:
       "Multiplayer chess with matchmaking, private games with friends, and offline bots up to about 1600 ELO. The server re-validates every single move and never trusts the client, ratings run on Glicko-2, and a dropped connection gets a 60 second grace period, because real-time software is mostly about what happens when things go wrong.",
     stack: "Flutter · Bun · Elysia · MongoDB · WebSockets",
-    href: "https://github.com/pa1narendra",
+    href: "https://github.com/pa1narendra/chess-mobile",
     linkLabel: "source",
   },
   {
@@ -90,7 +90,7 @@ export const projects: Project[] = [
     description:
       "Describe the role you want, then hold an actual spoken interview with an AI that asks follow-up questions and scores you across five categories when you hang up. The voice runs on Gemini Live over WebSockets, and the API key never reaches the browser, the server mints single-use tokens instead.",
     stack: "Next.js · TypeScript · Gemini Live · Postgres · Drizzle",
-    href: "https://ai-mock-interview-one-cyan.vercel.app",
+    href: "https://mockstar-ai.vercel.app",
     linkLabel: "live",
   },
   {

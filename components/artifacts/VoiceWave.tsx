@@ -193,9 +193,16 @@ export default function VoiceWave() {
       </div>
       <div className="wave-foot">
         <p className="artifact-caption mono">
-          {mic === "on" ? "that's your voice in the wave" : "move your cursor over the wave · it listens"}
+          {mic === "on"
+            ? "that's your voice in the wave · audio never leaves your browser"
+            : "move your cursor over the wave · it listens"}
         </p>
-        <button type="button" className="wave-mic mono" onClick={toggleMic}>
+        <button
+          type="button"
+          className="wave-mic mono"
+          title="uses the Web Audio API locally — nothing is recorded or sent anywhere"
+          onClick={toggleMic}
+        >
           {mic === "on" ? "■ stop mic" : mic === "denied" ? "mic blocked by browser" : "● test with your real mic"}
         </button>
       </div>

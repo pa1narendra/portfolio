@@ -6,11 +6,8 @@ export default function Reveal({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const [shown, setShown] = useState(false);
 
+  // reduced-motion visibility is handled purely in CSS (opacity forced to 1)
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setShown(true);
-      return;
-    }
     const el = ref.current;
     if (!el) return;
     const io = new IntersectionObserver(

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Boot sequence: name + counting line → anime Einstein waves hello →
 // the shutters split open and he's gone. A greeting, not a mascot.
@@ -81,16 +81,16 @@ function Einstein({ waving }: { waving: boolean }) {
 export default function Preloader() {
   const [phase, setPhase] = useState<"fill" | "greet" | "split" | "gone">("fill");
   const [pct, setPct] = useState(0);
+  const skipped = useRef(false);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setPhase("gone");
-      return;
-    }
-    // full boot + Einstein only once per session; instant entry after
-    if (sessionStorage.getItem("pnp.visited")) {
-      setPhase("gone");
-      return;
+    // reduced motion or a repeat visit this session: dismiss immediately
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      sessionStorage.getItem("pnp.visited")
+    ) {
+      const t = setTimeout(() => setPhase("gone"), 0);
+      return () => clearTimeout(t);
     }
     const t0 = performance.now();
     let raf = 0;
@@ -100,12 +100,18 @@ export default function Preloader() {
       if (p < 100) raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
-    const t1 = setTimeout(() => setPhase("greet"), 1500);
-    const t2 = setTimeout(() => setPhase("split"), 3050);
-    const t3 = setTimeout(() => {
-      setPhase("gone");
-      sessionStorage.setItem("pnp.visited", "1");
-    }, 4050);
+    const guarded = (fn: () => void) => () => {
+      if (!skipped.current) fn();
+    };
+    const t1 = setTimeout(guarded(() => setPhase("greet")), 1500);
+    const t2 = setTimeout(guarded(() => setPhase("split")), 3050);
+    const t3 = setTimeout(
+      guarded(() => {
+        setPhase("gone");
+        sessionStorage.setItem("pnp.visited", "1");
+      }),
+      4050,
+    );
     return () => {
       cancelAnimationFrame(raf);
       clearTimeout(t1);
@@ -136,6 +142,19 @@ export default function Preloader() {
       <span className="boot-pct mono" aria-hidden="true">
         {pct}
       </span>
+      {phase === "fill" && (
+        <button
+          type="button"
+          className="boot-skip mono"
+          onClick={() => {
+            skipped.current = true;
+            sessionStorage.setItem("pnp.visited", "1");
+            setPhase("gone");
+          }}
+        >
+          skip intro →
+        </button>
+      )}
     </div>
   );
 }

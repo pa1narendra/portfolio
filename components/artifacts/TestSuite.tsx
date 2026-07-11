@@ -23,8 +23,8 @@ export default function TestSuite() {
     const el = ref.current;
     if (!el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setDone(total + 1);
-      return;
+      const t = setTimeout(() => setDone(total + 1), 0);
+      return () => clearTimeout(t);
     }
     let timer: ReturnType<typeof setInterval> | null = null;
     const io = new IntersectionObserver(

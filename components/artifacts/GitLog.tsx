@@ -22,8 +22,8 @@ export default function GitLog() {
     const el = ref.current;
     if (!el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setShown(total + 1);
-      return;
+      const t = setTimeout(() => setShown(total + 1), 0);
+      return () => clearTimeout(t);
     }
     let timer: ReturnType<typeof setInterval> | null = null;
     const io = new IntersectionObserver(

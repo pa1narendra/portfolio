@@ -148,4 +148,4 @@ export const contact = {
 };
 
 export const consoleNote =
-  "%cYou opened the console. Of course you did.\nEvery demo on this page actually runs: Next.js, no component library, no animation library, one accent color.\nSay hello: https://github.com/pa1narendra";
+  "%cYou opened the console. Of course you did.\nEvery demo on this page actually runs: Next.js, GSAP, Framer Motion, a hand-rolled liquid shader, no component library, one accent color.\nSay hello: https://github.com/pa1narendra";

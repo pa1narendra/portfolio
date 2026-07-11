@@ -22,7 +22,7 @@ export default function StatusStrip() {
   return (
     <div className="status-strip mono" aria-label="live status">
       <span className="status-dot" aria-hidden="true" />
-      <span>all demos operational</span>
+      <span>three live demos below</span>
       <span className="status-sep">·</span>
       <span>shipping since 2024</span>
       <span className="status-sep">·</span>

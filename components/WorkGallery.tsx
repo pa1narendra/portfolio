@@ -80,6 +80,7 @@ export default function WorkGallery({ artifacts }: { artifacts: Record<string, R
 
   return (
     <section id="work" className="gallery" ref={secRef} style={{ scrollMarginTop: "4.5rem" }}>
+      <h2 className="sr-only">Selected work — three live demos</h2>
       <div className="g-rail" aria-hidden="true">
         <span className="g-rail-fill" />
       </div>

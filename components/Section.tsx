@@ -16,7 +16,7 @@ export default function Section({
   return (
     <section id={id} className="section" style={{ scrollMarginTop: "4.5rem" }}>
       <header className="section-head" data-num={num}>
-        <span className="mono-label">/ {title}</span>
+        <h2 className="mono-label">/ {title}</h2>
       </header>
       <Reveal>{children}</Reveal>
     </section>

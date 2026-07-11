@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# pavan · portfolio
 
-## Getting Started
+Personal portfolio of Pavan Narendra Peela, full-stack engineer. One idea drives the whole site: **everything on the page actually runs.** No screenshots pretending to be products — working miniatures of the real things.
 
-First, run the development server:
+## What's on the page
+
+- **Three live demos**, one per shipped product, presented on floating tablet frames inside a scroll-driven horizontal gallery:
+  - **Chessing** — a 3D CSS chessboard with a knight you can really move (legal-move highlighting, hop animation)
+  - **Mockstar** — a voice waveform that reacts to your cursor *or your actual microphone* (Web Audio API, processed locally, nothing recorded or sent), over a self-typing interview exchange
+  - **MoneyCap** — an SMS-to-ledger machine; type your own transaction SMS and watch the on-device-style parser extract the amount and merchant live
+- **A cinematic hero** whose headline disassembles letter-by-letter under scroll scrub
+- **Living sections**: the work log replays as an animated `git log`, principles run as a passing test suite, and contact is a mail composer that opens your mail app pre-filled
+- **A liquid background**: the lavender field bends along the cursor's path — an analytic gaussian-displacement shader (deliberately *not* a fluid simulation, so it cannot alias or artifact on any GPU)
+
+## Stack
+
+Next.js (App Router) · TypeScript · Tailwind v4 (custom tokens only, no component library) · GSAP + ScrollTrigger (scroll choreography) · Framer Motion (device-frame springs) · Lenis (smooth scroll) · one hand-written WebGL2 shader
+
+## Interaction & accessibility choices
+
+- All animation is transform/opacity only; one shared RAF loop via `gsap.ticker`
+- `prefers-reduced-motion` disables the loader, scrub, reveals, and shader — content is fully readable statically
+- Demos pause when off-screen (IntersectionObserver) and when the tab is hidden
+- Skip-to-content link, visible focus styles, semantic heading hierarchy, keyboard-operable demos
+- The intro loader plays once per session and has a visible skip
+- Microphone demo is opt-in, labeled, and processes audio locally only
+
+## Run it
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Content lives in one file: `lib/content.ts`. Design tokens live at the top of `app/globals.css`.

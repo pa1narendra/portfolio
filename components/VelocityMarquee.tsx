@@ -18,6 +18,12 @@ export default function VelocityMarquee() {
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       const loop = gsap.to(track, { xPercent: -50, ease: "none", duration: 22, repeat: -1 });
+      return () => loop.kill();
+    });
+
+    // velocity skew/speed reactions are desktop-only
+    mm.add("(min-width: 56rem) and (prefers-reduced-motion: no-preference)", () => {
+      const loop = gsap.getTweensOf(track)[0];
       const st = ScrollTrigger.create({
         onUpdate: (self) => {
           const v = self.getVelocity();
@@ -27,13 +33,10 @@ export default function VelocityMarquee() {
             ease: "power2.out",
             overwrite: "auto",
           });
-          loop.timeScale(gsap.utils.clamp(0.6, 4, 1 + Math.abs(v) / 900));
+          loop?.timeScale(gsap.utils.clamp(0.6, 4, 1 + Math.abs(v) / 900));
         },
       });
-      return () => {
-        st.kill();
-        loop.kill();
-      };
+      return () => st.kill();
     });
 
     return () => mm.revert();

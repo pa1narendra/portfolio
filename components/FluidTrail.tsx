@@ -61,6 +61,8 @@ export default function FluidTrail() {
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // phones/tablets get the static washes only — no WebGL loop at all
+    if (window.matchMedia("(max-width: 899px), (pointer: coarse)").matches) return;
     const canvas = ref.current;
     if (!canvas) return;
     const gl = canvas.getContext("webgl2", { alpha: false, antialias: false });

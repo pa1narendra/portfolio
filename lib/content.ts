@@ -106,16 +106,22 @@ export const projects: Project[] = [
   },
 ];
 
-export const projectFootnotes: { text: string; href?: string }[] = [
+export const otherWork: { name: string; status: string; desc: string; href?: string }[] = [
   {
-    text: "ERP-Portal, an order and production tracking system, runs in production for an eco-bag factory.",
+    name: "ERP-Portal",
+    status: "in production",
+    desc: "Order and production tracking for an eco-bag factory. Role-based access, a ten-stage pipeline, cash book, attendance, PDF reports. Real business, real users, running live.",
     href: "https://erp.buildnweb.in",
   },
   {
-    text: "shipstory, a Claude agent that reads a project deeply and writes honest posts about it.",
+    name: "shipstory",
+    status: "claude plugin",
+    desc: "An agent that reads a project deeply and writes honest social posts about it. Truth over hype, physically unable to publish on its own.",
   },
   {
-    text: "ai-job-search, an agentic pipeline that tailors LaTeX CVs and reviews its own output.",
+    name: "ai-job-search",
+    status: "personal tooling",
+    desc: "An agentic pipeline that tailors LaTeX CVs per posting, then a second agent reviews the drafts and a render loop checks the compiled PDFs.",
   },
 ];
 

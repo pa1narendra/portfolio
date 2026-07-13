@@ -60,8 +60,11 @@ export default function HeroCinematic() {
         { y: 34, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.9, ease: "power3.out", stagger: 0.12, delay: revisit ? 0.55 : 3.75 },
       );
+    });
 
-      // scrub-out: pin the hero and let scroll disassemble the headline
+    // the pin + scrub disassembly is desktop-only; mobile scrolls straight past
+    mm.add("(min-width: 56rem) and (prefers-reduced-motion: no-preference)", () => {
+      const letters = el.querySelectorAll(".hero-h .lt");
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: el,

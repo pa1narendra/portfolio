@@ -11,6 +11,8 @@ export default function GsapProvider() {
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // touch devices keep native scrolling — cheaper and feels right on mobile
+    if (window.matchMedia("(pointer: coarse)").matches) return;
     const lenis = new Lenis({ duration: 1.15 });
     lenis.on("scroll", ScrollTrigger.update);
     const raf = (time: number) => lenis.raf(time * 1000);

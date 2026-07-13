@@ -10,7 +10,7 @@ import ConsoleNote from "@/components/ConsoleNote";
 import ChessBoard from "@/components/artifacts/ChessBoard";
 import VoiceWave from "@/components/artifacts/VoiceWave";
 import MoneyMachine from "@/components/artifacts/MoneyMachine";
-import { site, links, projectFootnotes } from "@/lib/content";
+import { site, links, otherWork } from "@/lib/content";
 
 const ARTIFACTS = {
   chessing: <ChessBoard />,
@@ -29,25 +29,34 @@ export default function Home() {
       <VelocityMarquee />
       <WorkGallery artifacts={ARTIFACTS} />
       <main className="page">
-        <div className="footnotes">
-          {projectFootnotes.map((f, i) => (
-            <p key={i} className="footnote">
-              <span className="mono footnote-mark">{"†".repeat(i + 1)}</span> {f.text}{" "}
-              {f.href && (
-                <a className="u-link mono" href={f.href} target="_blank" rel="noreferrer">
-                  see it ↗
-                </a>
-              )}
-            </p>
-          ))}
-        </div>
-        <Section id="log" index={4} title="git log">
+        <Section id="more" index={4} title="also built">
+          <div className="other-grid">
+            {otherWork.map((w) => (
+              <article className="other-card" key={w.name}>
+                <span className="other-status mono">{w.status}</span>
+                <h3 className="other-name">{w.name}</h3>
+                <p className="other-desc">{w.desc}</p>
+                {w.href && (
+                  <a
+                    className="u-link mono other-link"
+                    href={w.href}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    visit ↗
+                  </a>
+                )}
+              </article>
+            ))}
+          </div>
+        </Section>
+        <Section id="log" index={5} title="git log">
           <Work />
         </Section>
-        <Section id="craft" index={5} title="principles, tested">
+        <Section id="craft" index={6} title="principles, tested">
           <Craft />
         </Section>
-        <Section id="contact" index={6} title="contact">
+        <Section id="contact" index={7} title="contact">
           <Contact />
         </Section>
         <footer className="footer">

@@ -5,6 +5,7 @@ export default function Nav() {
         p·n·p
       </a>
       <nav className="nav-links" aria-label="sections">
+        <a href="#about">about</a>
         <a href="#work">work</a>
         <a href="#log">log</a>
         <a href="#craft">craft</a>

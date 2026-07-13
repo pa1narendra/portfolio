@@ -10,7 +10,7 @@ import ConsoleNote from "@/components/ConsoleNote";
 import ChessBoard from "@/components/artifacts/ChessBoard";
 import VoiceWave from "@/components/artifacts/VoiceWave";
 import MoneyMachine from "@/components/artifacts/MoneyMachine";
-import { site, links, otherWork } from "@/lib/content";
+import { site, links, about, otherWork } from "@/lib/content";
 
 const ARTIFACTS = {
   chessing: <ChessBoard />,
@@ -27,6 +27,18 @@ export default function Home() {
         <HeroCinematic />
       </main>
       <VelocityMarquee />
+      <main className="page">
+        <Section id="about" index={1} title="about">
+          <div className="about-grid">
+            <p className="about-lede serif-accent">{about.lede}</p>
+            <div className="about-body">
+              {about.body.map((para, i) => (
+                <p key={i}>{para}</p>
+              ))}
+            </div>
+          </div>
+        </Section>
+      </main>
       <WorkGallery artifacts={ARTIFACTS} />
       <main className="page">
         <Section id="more" index={4} title="also built">

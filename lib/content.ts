@@ -18,8 +18,14 @@ export const hero = {
   kicker: "pavan narendra peela · full-stack engineer",
   headingA: "I build",
   headingB: "real software.",
-  intro:
-    "I'm Pavan. I watch how things work, I get curious, and then I build my own version to find out if I actually understood it. Everything below is something I made, shipped, and use, and every demo on this page actually runs. Go ahead, touch them.",
+};
+
+export const about = {
+  lede: "I watch how things work, I get curious, and then I build my own version to find out if I actually understood it.",
+  body: [
+    "I'm Pavan, a full-stack engineer. Everything on this site is something I made, shipped, and use. No team, no funding, just someone who likes building things properly.",
+    "That's also why every demo on this page actually runs. The chess knight moves, the SMS parser parses, the waveform hears your real microphone. I'd rather show you working software than describe it.",
+  ],
 };
 
 export interface LogEntry {

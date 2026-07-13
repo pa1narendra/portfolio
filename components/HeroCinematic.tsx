@@ -40,7 +40,7 @@ export default function HeroCinematic() {
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       const letters = el.querySelectorAll(".hero-h .lt");
-      const rest = el.querySelectorAll(".hero-kicker, .hero-intro, .status-strip");
+      const rest = el.querySelectorAll(".hero-kicker, .status-strip");
 
       // entrance (behind the boot shutters, after Einstein's greeting)
       gsap.fromTo(
@@ -87,7 +87,6 @@ export default function HeroCinematic() {
         },
         0,
       )
-        .to(el.querySelector(".hero-intro"), { y: -90, opacity: 0 }, 0.04)
         .to(el.querySelector(".status-strip"), { y: -70, opacity: 0 }, 0.1)
         .to(el.querySelector(".hero-kicker"), { y: -50, opacity: 0 }, 0);
     });
@@ -113,7 +112,6 @@ export default function HeroCinematic() {
           </span>
         </span>
       </h1>
-      <p className="hero-intro">{hero.intro}</p>
       <StatusStrip />
     </section>
   );

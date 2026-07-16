@@ -15,7 +15,7 @@ export const site = {
 };
 
 export const hero = {
-  kicker: "pavan narendra peela · full-stack engineer",
+  kicker: "pavan narendra peela · full-stack engineer · health-tech, realtime & ai",
   headingA: "I build",
   headingB: "real software.",
 };
@@ -23,8 +23,8 @@ export const hero = {
 export const about = {
   lede: "I watch how things work, I get curious, and then I build my own version to find out if I actually understood it.",
   body: [
-    "I'm Pavan, a full-stack engineer. Everything on this site is something I made, shipped, and use. No team, no funding, just someone who likes building things properly.",
-    "That's also why every demo on this page actually runs. The chess knight moves, the SMS parser parses, the waveform hears your real microphone. I'd rather show you working software than describe it.",
+    "By day I'm a full-stack engineer at Vectorsoft, building an EMR for clinics. I shipped the form builder behind its onboarding and counselling forms and the chat system its users talk through, and right now I'm driving SOC 2 and HIPAA compliance for it, because it handles patient data, while managing its AWS side. Before that I was at FlyingFox Labs working with Frappe, ERPNext, Docker and Helm, and running the backend of a fintech product.",
+    "Off the clock I build my own things, and everything you see below is one of them, made, shipped, and used daily by me. Every demo on this page actually runs. The chess knight moves, the SMS parser parses, the waveform hears your real microphone. I'd rather show you working software than describe it.",
   ],
 };
 
@@ -37,14 +37,24 @@ export interface LogEntry {
 export const log: { entries: LogEntry[] } = {
   entries: [
     {
-      id: "job",
-      date: "2024",
-      text: "Started working as a full-stack engineer. Learned that shipping is a different skill from coding.",
+      id: "flyingfox",
+      date: "jun 2024",
+      text: "Joined FlyingFox Labs. Frappe and ERPNext for CRM tooling, a Frappe backend for an internal app, Docker, Helm charts, GitLab pipelines, and running the backend of a fintech product that isn't public.",
+    },
+    {
+      id: "vectorsoft",
+      date: "jan 2025",
+      text: "Moved to Vectorsoft to build an EMR for clinics. First shipped the form builder that powers onboarding and counselling forms.",
+    },
+    {
+      id: "chat",
+      date: "2025",
+      text: "Built the custom chat system clinic users talk through inside the EMR.",
     },
     {
       id: "chessing",
       date: "2025",
-      text: "Built Chessing, a full multiplayer chess platform, because I wanted to know how real-time games actually stay honest.",
+      text: "Built Chessing on the side, a full multiplayer chess platform, because I wanted to know how real-time games actually stay honest.",
     },
     {
       id: "moneycap-start",
@@ -60,6 +70,11 @@ export const log: { entries: LogEntry[] } = {
       id: "mockstar",
       date: "2026",
       text: "Shipped Mockstar, a voice AI that interviews you out loud and scores you honestly when you hang up.",
+    },
+    {
+      id: "now",
+      date: "now",
+      text: "Driving SOC 2 and HIPAA compliance for the EMR, since it handles patient data, and managing its AWS footprint — Cognito, S3, EC2, Route 53.",
     },
   ],
 };

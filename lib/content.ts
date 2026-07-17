@@ -23,8 +23,8 @@ export const hero = {
 export const about = {
   lede: "I watch how things work, I get curious, and then I build my own version to find out if I actually understood it.",
   body: [
-    "By day I'm a full-stack engineer at Vectorsoft, building an EMR for clinics. I shipped the form builder behind its onboarding and counselling forms and the chat system its users talk through, and right now I'm driving SOC 2 and HIPAA compliance for it, because it handles patient data, while managing its AWS side. Before that I was at FlyingFox Labs working with Frappe, ERPNext, Docker and Helm, and running the backend of a fintech product.",
-    "Off the clock I build my own things, and everything you see below is one of them, made, shipped, and used daily by me. Every demo on this page actually runs. The chess knight moves, the SMS parser parses, the waveform hears your real microphone. I'd rather show you working software than describe it.",
+    "By day I'm a full-stack engineer at Vectorsoft, building an EMR used by 20 clinics across Illinois and Michigan, 200+ users a day, patient records for close to 10,000 people. I shipped its schema-driven form builder and the realtime chat system its clinics run on, and right now I own the engineering side of getting it SOC 2 and HIPAA compliant, since it holds patient data. Before that I was at FlyingFox Labs on Frappe, ERPNext, Docker and Helm, running the backend of a private fintech product.",
+    "Off the clock I build my own things, and everything below is one of them, made, shipped, and used daily by me. Every demo on this page actually runs. The chess knight moves, the SMS parser parses, the waveform hears your real microphone. I'd rather show you working software than describe it.",
   ],
 };
 
@@ -44,12 +44,12 @@ export const log: { entries: LogEntry[] } = {
     {
       id: "vectorsoft",
       date: "jan 2025",
-      text: "Moved to Vectorsoft to build an EMR for clinics. First shipped the form builder that powers onboarding and counselling forms.",
+      text: "Moved to Vectorsoft to build an EMR now used by 20 clinics across Illinois and Michigan (200+ daily users, ~10,000 patients). First shipped its form builder in React — drag-and-drop for simple forms, schema-driven for complex ones. I rebuilt it five ways across different libraries to find the version that actually held up.",
     },
     {
       id: "chat",
       date: "2025",
-      text: "Built the custom chat system clinic users talk through inside the EMR.",
+      text: "Built the EMR's realtime chat on WebSockets and a Redis cache. Not a normal chat — clinic staff drop patient profiles and spin up todos right inside the thread, so the message format had to carry more than text.",
     },
     {
       id: "chessing",
@@ -74,7 +74,7 @@ export const log: { entries: LogEntry[] } = {
     {
       id: "now",
       date: "now",
-      text: "Driving SOC 2 and HIPAA compliance for the EMR, since it handles patient data, and managing its AWS footprint — Cognito, S3, EC2, Route 53.",
+      text: "Owning the engineering side of SOC 2 and HIPAA for the EMR — implementing controls, writing the security policies, and acting as the point of contact between our team, the auditor, and the client. Also running its AWS footprint: Cognito, S3, EC2, Route 53.",
     },
   ],
 };

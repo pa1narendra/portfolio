@@ -85,12 +85,10 @@ export default function WorkGallery({ artifacts }: { artifacts: Record<string, R
         <span className="g-rail-fill" />
       </div>
       <div className="gallery-track" ref={trackRef}>
-        {projects.map((p, i) => (
+        {projects.map((p) => (
           <article className="g-panel" key={p.id}>
             <div className="g-copy">
-              <p className="mono-label">
-                {String(i + 1).padStart(2, "0")} / {p.code}
-              </p>
+              <p className="mono-label">{p.code}</p>
               <h3 className="g-name">{p.name}</h3>
               <p className="project-tagline">{p.tagline}</p>
               <p className="project-desc">{p.description}</p>

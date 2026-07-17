@@ -2,6 +2,7 @@ import Nav from "@/components/Nav";
 import Section from "@/components/Section";
 import HeroCinematic from "@/components/HeroCinematic";
 import WorkGallery from "@/components/WorkGallery";
+import StatsBand from "@/components/StatsBand";
 import Work from "@/components/sections/Work";
 import Craft from "@/components/sections/Craft";
 import Contact from "@/components/sections/Contact";
@@ -25,9 +26,6 @@ export default function Home() {
       <Nav />
       <main className="page">
         <HeroCinematic />
-      </main>
-      <VelocityMarquee />
-      <main className="page">
         <Section id="about" index={1} title="about">
           <div className="about-grid">
             <div className="about-left">
@@ -46,9 +44,13 @@ export default function Home() {
           </div>
         </Section>
       </main>
+
+      <VelocityMarquee />
       <WorkGallery artifacts={ARTIFACTS} />
+      <StatsBand />
+
       <main className="page">
-        <Section id="more" index={4} title="also built">
+        <Section id="more" index={2} title="also built">
           <div className="other-grid">
             {otherWork.map((w) => (
               <article className="other-card" key={w.name}>
@@ -69,16 +71,21 @@ export default function Home() {
             ))}
           </div>
         </Section>
-        <Section id="log" index={5} title="career">
+
+        <Section id="log" index={3} title="career">
           <p className="section-lede serif-accent">The short version of how I got here.</p>
           <Work />
         </Section>
-        <Section id="craft" index={6} title="principles, tested">
+
+        <Section id="craft" index={4} title="approach">
+          <p className="section-lede serif-accent">Five things I keep coming back to.</p>
           <Craft />
         </Section>
-        <Section id="contact" index={7} title="contact">
+
+        <Section id="contact" index={5} title="contact">
           <Contact />
         </Section>
+
         <footer className="footer">
           <span className="mono-label">© 2026 {site.name}</span>
           <a className="u-link mono footer-src" href={links.github} target="_blank" rel="noreferrer">

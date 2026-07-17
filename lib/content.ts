@@ -147,32 +147,51 @@ export const otherWork: { name: string; status: string; desc: string; href?: str
   },
 ];
 
-export const principles: { no: string; text: string }[] = [
+// the "chorus" — a dark stats band that breaks the pale rhythm
+export const stats: { value: string; label: string }[] = [
+  { value: "~20", label: "clinics run on software I built" },
+  { value: "200+", label: "people using it every day" },
+  { value: "10k", label: "patient records it safely holds" },
+  { value: "6", label: "products built end to end" },
+];
+
+export const principles: { no: string; title: string; detail: string }[] = [
   {
     no: "01",
-    text: "Watch first, learn second, build third. I don't trust that I know something until I've made my own version of it.",
+    title: "Watch, then build.",
+    detail:
+      "I don't really trust that I understand something until I've built my own version of it. That's how almost everything here started.",
   },
   {
     no: "02",
-    text: "Boring technology used carefully beats clever technology used carelessly.",
+    title: "Boring tech, used well.",
+    detail:
+      "Careful use of dull, proven tools beats clever use of shiny ones nearly every time. Interesting problems deserve unremarkable foundations.",
   },
   {
     no: "03",
-    text: "If I won't use it every day, I don't ship it. MoneyCap survived because I can't escape its bugs.",
+    title: "Ship only what I'd use.",
+    detail:
+      "If it won't survive my own daily use, it doesn't go out. MoneyCap got good because I couldn't escape its bugs.",
   },
   {
     no: "04",
-    text: "Read the margins. The interesting parts of any system live in the edge cases, the reconnects, the retries.",
+    title: "Read the margins.",
+    detail:
+      "The real work lives in the edge cases — the reconnects, the retries, the moments things go wrong. That's where I spend most of my time.",
   },
   {
     no: "05",
-    text: "If it isn't shipped, it doesn't exist.",
+    title: "Finished beats perfect.",
+    detail:
+      "A demo isn't a product. I'd rather ship something real and keep improving it than polish forever and never let go.",
   },
 ];
 
 export const contact = {
-  heading: "Write to me",
-  body: "I like hearing from people who build things, or want to start. No forms, no scheduling links, just the usual places.",
+  heading: "Let's talk",
+  body: "If you're building something interesting, looking for someone who actually ships, or just want to compare notes, I'd genuinely love to hear from you. No forms, no calendar links — whichever of these is easiest.",
+  closer: "Usually reply within a day.",
 };
 
 export const consoleNote =

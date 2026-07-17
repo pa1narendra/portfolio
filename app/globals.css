@@ -942,10 +942,69 @@ h3 {
   align-items: start;
 }
 
+.about-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  position: sticky;
+  top: 5.5rem;
+}
+
 .about-lede {
   font-size: clamp(1.5rem, 2.6vw, 2.125rem);
   line-height: 1.35;
   color: var(--fg);
+}
+
+/* availability chip */
+.about-now {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  align-self: flex-start;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.55rem 0.95rem;
+  max-width: 100%;
+}
+
+.about-now-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  box-shadow: 0 0 0 0 rgba(165, 118, 59, 0.5);
+  animation: now-pulse 2.4s ease-out infinite;
+}
+
+.about-now-label {
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-right: 0.15rem;
+}
+
+@keyframes now-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(165, 118, 59, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(165, 118, 59, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(165, 118, 59, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-now-dot {
+    animation: none;
+  }
 }
 
 .about-body {
@@ -956,13 +1015,31 @@ h3 {
 }
 
 .about-body p {
-  font-size: 1.0625rem;
+  font-size: 1.125rem;
+  line-height: 1.7;
   color: var(--muted);
+}
+
+.about-body p:first-child {
+  color: var(--fg);
+}
+
+/* shared lede for career/other sections */
+.section-lede {
+  font-size: clamp(1.25rem, 2vw, 1.625rem);
+  line-height: 1.4;
+  color: var(--muted);
+  max-width: 34rem;
+  margin-bottom: 2rem;
 }
 
 @media (max-width: 56rem) {
   .about-grid {
     grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+  .about-left {
+    position: static;
     gap: 1.5rem;
   }
 }

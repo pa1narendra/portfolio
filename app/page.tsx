@@ -30,7 +30,14 @@ export default function Home() {
       <main className="page">
         <Section id="about" index={1} title="about">
           <div className="about-grid">
-            <p className="about-lede serif-accent">{about.lede}</p>
+            <div className="about-left">
+              <p className="about-lede serif-accent">{about.lede}</p>
+              <p className="about-now mono">
+                <span className="about-now-dot" aria-hidden="true" />
+                <span className="about-now-label">currently</span>
+                {about.now}
+              </p>
+            </div>
             <div className="about-body">
               {about.body.map((para, i) => (
                 <p key={i}>{para}</p>
@@ -62,7 +69,8 @@ export default function Home() {
             ))}
           </div>
         </Section>
-        <Section id="log" index={5} title="git log">
+        <Section id="log" index={5} title="career">
+          <p className="section-lede serif-accent">The short version of how I got here.</p>
           <Work />
         </Section>
         <Section id="craft" index={6} title="principles, tested">

@@ -23,9 +23,10 @@ export const hero = {
 export const about = {
   lede: "I watch how things work, I get curious, and then I build my own version to find out if I actually understood it.",
   body: [
-    "By day I'm a full-stack engineer at Vectorsoft, building an EMR used by 20 clinics across Illinois and Michigan, 200+ users a day, patient records for close to 10,000 people. I shipped its schema-driven form builder and the realtime chat system its clinics run on, and right now I own the engineering side of getting it SOC 2 and HIPAA compliant, since it holds patient data. Before that I was at FlyingFox Labs on Frappe, ERPNext, Docker and Helm, running the backend of a private fintech product.",
-    "Off the clock I build my own things, and everything below is one of them, made, shipped, and used daily by me. Every demo on this page actually runs. The chess knight moves, the SMS parser parses, the waveform hears your real microphone. I'd rather show you working software than describe it.",
+    "By day I'm a full-stack engineer at Vectorsoft, building an EMR that real clinics run on. I've shipped its form builder and its realtime chat, and these days I handle the security and compliance side that comes with holding patient data.",
+    "Off the clock I build my own things, and everything below is one of them, made and shipped and actually used. And every demo on this page runs for real. I'd rather show you working software than talk about it.",
   ],
+  now: "security & compliance at Vectorsoft · open to good problems",
 };
 
 export interface LogEntry {
@@ -39,22 +40,22 @@ export const log: { entries: LogEntry[] } = {
     {
       id: "flyingfox",
       date: "jun 2024",
-      text: "Joined FlyingFox Labs. Frappe and ERPNext for CRM tooling, a Frappe backend for an internal app, Docker, Helm charts, GitLab pipelines, and running the backend of a fintech product that isn't public.",
+      text: "Joined FlyingFox Labs. Frappe and ERPNext, Docker and Helm, and the backend of a private fintech product.",
     },
     {
       id: "vectorsoft",
       date: "jan 2025",
-      text: "Moved to Vectorsoft to build an EMR now used by 20 clinics across Illinois and Michigan (200+ daily users, ~10,000 patients). First shipped its form builder in React — drag-and-drop for simple forms, schema-driven for complex ones. I rebuilt it five ways across different libraries to find the version that actually held up.",
+      text: "Moved to Vectorsoft to build an EMR that clinics across a couple of US states now run on. Shipped its React form builder first.",
     },
     {
       id: "chat",
       date: "2025",
-      text: "Built the EMR's realtime chat on WebSockets and a Redis cache. Not a normal chat — clinic staff drop patient profiles and spin up todos right inside the thread, so the message format had to carry more than text.",
+      text: "Built the EMR's realtime chat on WebSockets and Redis — clinic staff share patient profiles and open todos right in the thread.",
     },
     {
       id: "chessing",
       date: "2025",
-      text: "Built Chessing on the side, a full multiplayer chess platform, because I wanted to know how real-time games actually stay honest.",
+      text: "Built Chessing on the side, a multiplayer chess app, because I wanted to know how real-time games actually stay honest.",
     },
     {
       id: "moneycap-start",
@@ -74,7 +75,7 @@ export const log: { entries: LogEntry[] } = {
     {
       id: "now",
       date: "now",
-      text: "Owning the engineering side of SOC 2 and HIPAA for the EMR — implementing controls, writing the security policies, and acting as the point of contact between our team, the auditor, and the client. Also running its AWS footprint: Cognito, S3, EC2, Route 53.",
+      text: "On the security side of the EMR now — SOC 2 and HIPAA, plus running its AWS setup (Cognito, S3, EC2, Route 53).",
     },
   ],
 };
@@ -96,34 +97,34 @@ export const projects: Project[] = [
     id: "chessing",
     code: "CHS·01",
     name: "Chessing",
-    tagline: "a chess platform built to understand real-time systems",
+    tagline: "chess worth coming back to",
     description:
-      "Multiplayer chess with matchmaking, private games with friends, and offline bots up to about 1600 ELO. The server re-validates every single move and never trusts the client, ratings run on Glicko-2, and a dropped connection gets a 60 second grace period, because real-time software is mostly about what happens when things go wrong.",
+      "Want to actually get better at chess, not just pass the time? Play ranked matches, challenge a friend with a code, or train against offline bots when you're on your own.",
     stack: "Flutter · Bun · Elysia · MongoDB · WebSockets",
     href: "https://github.com/pa1narendra/chess-mobile",
-    linkLabel: "source",
+    linkLabel: "see the code",
   },
   {
     id: "mockstar",
     code: "MCK·02",
     name: "Mockstar",
-    tagline: "a voice AI that interviews you for real",
+    tagline: "rehearse the interview first",
     description:
-      "Describe the role you want, then hold an actual spoken interview with an AI that asks follow-up questions and scores you across five categories when you hang up. The voice runs on Gemini Live over WebSockets, and the API key never reaches the browser, the server mints single-use tokens instead.",
+      "Prepping for your first job, or planning a switch? Mockstar runs a real mock interview out loud — it talks, asks follow-ups, and scores you honestly the moment you hang up.",
     stack: "Next.js · TypeScript · Gemini Live · Postgres · Drizzle",
     href: "https://mockstar-ai.vercel.app",
-    linkLabel: "live",
+    linkLabel: "try it",
   },
   {
     id: "moneycap",
     code: "MNY·03",
     name: "MoneyCap",
-    tagline: "an expense tracker with no typing in it",
+    tagline: "expenses that track themselves",
     description:
-      "My phone already knows what I spend, every transaction lands in the SMS inbox. MoneyCap reads those messages on the device, classifies them through a multi-stage parser, and never sends a byte anywhere. No manual entry, no cloud, no account. I built it for myself and I am still its harshest user.",
+      "Paying through five different apps and losing track of your money? MoneyCap reads your transaction texts right on your phone and keeps the ledger for you. No typing, nothing leaves your device.",
     stack: "Flutter · SQLite · on-device parsing · GitHub Actions",
     href: "https://github.com/pa1narendra/MoneyCap/releases/latest",
-    linkLabel: "download",
+    linkLabel: "try it",
   },
 ];
 

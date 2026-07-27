@@ -22,9 +22,9 @@ export default function StatusStrip() {
   return (
     <div className="status-strip mono" aria-label="live status">
       <span className="status-dot" aria-hidden="true" />
-      <span>three live demos below</span>
+      <span>three interactive systems</span>
       <span className="status-sep">·</span>
-      <span>shipping since 2024</span>
+      <span>hyderabad, india</span>
       <span className="status-sep">·</span>
       <span suppressHydrationWarning>{time ? `IST ${time}` : "IST —:—:—"}</span>
     </div>

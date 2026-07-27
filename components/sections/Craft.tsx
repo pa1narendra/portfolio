@@ -11,6 +11,9 @@ export default function Craft() {
               <span className="creed-no mono">{p.no}</span>
               <h3 className="creed-title serif-accent">{p.title}</h3>
               <p className="creed-detail">{p.detail}</p>
+              <p className="creed-evidence mono">
+                <span>proof /</span> {p.evidence}
+              </p>
             </article>
           </Reveal>
         </li>

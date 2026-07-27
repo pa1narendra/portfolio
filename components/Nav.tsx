@@ -5,10 +5,9 @@ export default function Nav() {
         p·n·p
       </a>
       <nav className="nav-links" aria-label="sections">
-        <a href="#about">about</a>
         <a href="#work">work</a>
-        <a href="#log">career</a>
-        <a href="#craft">approach</a>
+        <a href="#log">timeline</a>
+        <a href="#about">about</a>
         <a href="#contact">contact</a>
       </nav>
     </header>

@@ -42,7 +42,7 @@ export default function OgImage() {
             textTransform: "uppercase",
           }}
         >
-          <span>I build</span>
+          <span>Software that</span>
           <span
             style={{
               color: "#a5763b",
@@ -52,7 +52,7 @@ export default function OgImage() {
               fontWeight: 400,
             }}
           >
-            real software.
+            survives real users.
           </span>
         </div>
         <div
@@ -65,7 +65,7 @@ export default function OgImage() {
             display: "flex",
           }}
         >
-          every demo on this page actually runs · chessing · mockstar · moneycap
+          working systems notebook / chessing / mockstar / moneycap
         </div>
       </div>
     ),

@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import { Archivo, Newsreader, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
-import Preloader from "@/components/Preloader";
 import BackgroundWash from "@/components/BackgroundWash";
 import FluidTrail from "@/components/FluidTrail";
-import Cursor from "@/components/Cursor";
 import GsapProvider from "@/components/GsapProvider";
 import { site } from "@/lib/content";
+import { siteUrl } from "@/lib/site-url";
 
 const archivo = Archivo({
   subsets: ["latin"],
@@ -28,9 +27,10 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  // TODO: set metadataBase to the real domain at deploy time
+  metadataBase: siteUrl,
   title: site.title,
   description: site.description,
+  alternates: { canonical: "/" },
   authors: [{ name: site.name, url: "https://github.com/pa1narendra" }],
   creator: site.name,
   openGraph: {
@@ -59,13 +59,11 @@ export default function RootLayout({
       className={`${archivo.variable} ${newsreader.variable} ${plexMono.variable}`}
     >
       <body>
-        <a href="#top" className="skip-link mono">
+        <a href="#content" className="skip-link mono">
           skip to content
         </a>
-        <Preloader />
         <BackgroundWash />
         <FluidTrail />
-        <Cursor />
         <GsapProvider />
         <div className="grain" aria-hidden="true" />
         {children}

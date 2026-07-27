@@ -6,7 +6,6 @@ import StatsBand from "@/components/StatsBand";
 import Work from "@/components/sections/Work";
 import Craft from "@/components/sections/Craft";
 import Contact from "@/components/sections/Contact";
-import VelocityMarquee from "@/components/VelocityMarquee";
 import ConsoleNote from "@/components/ConsoleNote";
 import ChessBoard from "@/components/artifacts/ChessBoard";
 import VoiceWave from "@/components/artifacts/VoiceWave";
@@ -24,8 +23,9 @@ export default function Home() {
     <>
       <ConsoleNote />
       <Nav />
-      <main className="page">
-        <HeroCinematic />
+      <main id="content">
+        <div className="page">
+          <HeroCinematic />
         <Section id="about" index={1} title="about">
           <div className="about-grid">
             <div className="about-left">
@@ -42,20 +42,32 @@ export default function Home() {
               ))}
             </div>
           </div>
-        </Section>
-      </main>
+          </Section>
+        </div>
 
-      <VelocityMarquee />
-      <WorkGallery artifacts={ARTIFACTS} />
-      <StatsBand />
+        <div className="page">
+          <Section id="work" index={2} title="working systems">
+          <div className="notebook-intro">
+            <p className="section-lede serif-accent">
+              Three products, reduced to the decisions that make them work.
+            </p>
+            <p className="notebook-note mono">
+              field note / each miniature is interactive / scroll to inspect
+            </p>
+          </div>
+          </Section>
+        </div>
+        <WorkGallery artifacts={ARTIFACTS} />
+        <StatsBand />
 
-      <main className="page">
-        <Section id="more" index={2} title="also built">
+        <div className="page">
+          <Section id="more" index={3} title="also built">
           <div className="other-grid">
             {otherWork.map((w) => (
               <article className="other-card" key={w.name}>
                 <span className="other-status mono">{w.status}</span>
                 <h3 className="other-name">{w.name}</h3>
+                {w.label && <span className="other-label mono">{w.label}</span>}
                 <p className="other-desc">{w.desc}</p>
                 {w.href && (
                   <a
@@ -67,31 +79,37 @@ export default function Home() {
                     visit ↗
                   </a>
                 )}
+                {!w.href && w.note && <span className="other-note mono">{w.note}</span>}
               </article>
             ))}
           </div>
         </Section>
 
-        <Section id="log" index={3} title="career">
-          <p className="section-lede serif-accent">The short version of how I got here.</p>
+        <Section id="log" index={4} title="build log">
+          <p className="section-lede serif-accent">
+            Production systems, side projects, and the lessons between them.
+          </p>
           <Work />
         </Section>
 
-        <Section id="craft" index={4} title="approach">
-          <p className="section-lede serif-accent">Five things I keep coming back to.</p>
+        <Section id="craft" index={5} title="approach">
+          <p className="section-lede serif-accent">
+            Five principles, with the projects that tested them.
+          </p>
           <Craft />
         </Section>
 
-        <Section id="contact" index={5} title="contact">
+        <Section id="contact" index={6} title="contact">
           <Contact />
         </Section>
 
         <footer className="footer">
-          <span className="mono-label">© 2026 {site.name}</span>
+          <span className="mono-label">© {new Date().getFullYear()} {site.name}</span>
           <a className="u-link mono footer-src" href={links.github} target="_blank" rel="noreferrer">
             view source ↗
           </a>
-        </footer>
+          </footer>
+        </div>
       </main>
     </>
   );

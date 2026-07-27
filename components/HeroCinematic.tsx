@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { hero } from "@/lib/content";
 import StatusStrip from "./StatusStrip";
 
@@ -25,24 +24,19 @@ function Letters({ text }: { text: string }) {
   );
 }
 
-// Pinned cinematic hero: letters rise in behind the boot shutters,
-// then scrolling scrubs them apart — the headline disassembles as you leave.
+// A short typographic entrance; the content remains stable once it arrives.
 export default function HeroCinematic() {
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
     const el = ref.current;
     if (!el) return;
     const mm = gsap.matchMedia();
-    // returning visitors skip the boot, so the hero shouldn't wait for it
-    const revisit = sessionStorage.getItem("pnp.visited") === "1";
-
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       const letters = el.querySelectorAll(".hero-h .lt");
       const rest = el.querySelectorAll(".hero-kicker, .status-strip");
 
-      // entrance (behind the boot shutters, after Einstein's greeting)
+      // Brief entrance, without delaying access to the portfolio.
       gsap.fromTo(
         letters,
         { yPercent: 120 },
@@ -51,44 +45,15 @@ export default function HeroCinematic() {
           duration: 1.15,
           ease: "power4.out",
           stagger: 0.028,
-          delay: revisit ? 0.2 : 3.35,
+          delay: 0.12,
           onComplete: () => el.classList.add("unmasked"),
         },
       );
       gsap.fromTo(
         rest,
         { y: 34, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.9, ease: "power3.out", stagger: 0.12, delay: revisit ? 0.55 : 3.75 },
+        { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", stagger: 0.1, delay: 0.35 },
       );
-    });
-
-    // the pin + scrub disassembly is desktop-only; mobile scrolls straight past
-    mm.add("(min-width: 56rem) and (prefers-reduced-motion: no-preference)", () => {
-      const letters = el.querySelectorAll(".hero-h .lt");
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: el,
-          start: "top top",
-          end: "+=110%",
-          scrub: 1,
-          pin: true,
-          anticipatePin: 1,
-        },
-      });
-      tl.to(
-        letters,
-        {
-          yPercent: -160,
-          rotate: () => gsap.utils.random(-16, 16),
-          xPercent: () => gsap.utils.random(-40, 40),
-          opacity: 0,
-          stagger: { each: 0.014, from: "random" },
-          ease: "power1.in",
-        },
-        0,
-      )
-        .to(el.querySelector(".status-strip"), { y: -70, opacity: 0 }, 0.1)
-        .to(el.querySelector(".hero-kicker"), { y: -50, opacity: 0 }, 0);
     });
 
     return () => mm.revert();
@@ -100,15 +65,15 @@ export default function HeroCinematic() {
       <h1 className="hero-h">
         <span className="line-mask">
           <span>
-            <Letters text="I build" />
+            <Letters text={hero.headingA} />
           </span>
         </span>
         <span className="line-mask">
           <span>
             <em className="serif-accent">
-              <Letters text="real" />
+              <Letters text={hero.headingAccent} />
             </em>{" "}
-            <Letters text="software." />
+            <Letters text={hero.headingB} />
           </span>
         </span>
       </h1>

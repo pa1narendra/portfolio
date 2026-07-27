@@ -168,7 +168,7 @@ export default function MoneyMachine() {
           </div>
         </div>
       </div>
-      <p className="artifact-caption mono">no typing needed in the real app. but here, try the parser.</p>
+      <p className="artifact-caption mono">the product reads messages automatically. here, test the parser yourself.</p>
     </div>
   );
 }

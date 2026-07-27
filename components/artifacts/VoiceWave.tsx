@@ -78,6 +78,7 @@ export default function VoiceWave() {
     if (!canvas || !ctx) return;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     let raf = 0;
+    let visible = false;
     let t = 0;
     const resize = () => {
       const r = canvas.getBoundingClientRect();
@@ -129,11 +130,26 @@ export default function VoiceWave() {
         ctx.lineWidth = layer === 1 ? 1.5 : 1;
         ctx.stroke();
       }
-      raf = requestAnimationFrame(tick);
+      if (visible && !document.hidden) raf = requestAnimationFrame(tick);
     };
-    raf = requestAnimationFrame(tick);
+    const visibility = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+        cancelAnimationFrame(raf);
+        if (visible && !document.hidden) raf = requestAnimationFrame(tick);
+      },
+      { threshold: 0.05 },
+    );
+    visibility.observe(canvas);
+    const onVisibility = () => {
+      cancelAnimationFrame(raf);
+      if (visible && !document.hidden) raf = requestAnimationFrame(tick);
+    };
+    document.addEventListener("visibilitychange", onVisibility);
     return () => {
       cancelAnimationFrame(raf);
+      visibility.disconnect();
+      document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("resize", resize);
       root?.removeEventListener("pointermove", onMove);
     };

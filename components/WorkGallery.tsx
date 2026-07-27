@@ -5,7 +5,6 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { projects } from "@/lib/content";
 import DeviceFrame from "./DeviceFrame";
-import Magnetic from "./Magnetic";
 
 // The centerpiece: vertical scroll drives a pinned horizontal journey
 // through the three live demos, each riding its own floating device.
@@ -79,26 +78,35 @@ export default function WorkGallery({ artifacts }: { artifacts: Record<string, R
   }, []);
 
   return (
-    <section id="work" className="gallery" ref={secRef} style={{ scrollMarginTop: "4.5rem" }}>
-      <h2 className="sr-only">Selected work — three live demos</h2>
+    <section id="systems" className="gallery" ref={secRef} aria-label="interactive system notes">
+      <h2 className="sr-only">Three interactive system notes</h2>
       <div className="g-rail" aria-hidden="true">
         <span className="g-rail-fill" />
       </div>
       <div className="gallery-track" ref={trackRef}>
-        {projects.map((p) => (
+        {projects.map((p, index) => (
           <article className="g-panel" key={p.id}>
             <div className="g-copy">
-              <p className="mono-label">{p.code}</p>
+              <div className="g-meta-row mono-label">
+                <span>{p.code} / field test</span>
+                <span>{String(index + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")}</span>
+              </div>
               <h3 className="g-name">{p.name}</h3>
               <p className="project-tagline">{p.tagline}</p>
               <p className="project-desc">{p.description}</p>
               <p className="mono project-meta">{p.stack}</p>
+              <dl className="field-notes">
+                {p.fieldNotes.map((note) => (
+                  <div className="field-note" key={note.label}>
+                    <dt className="mono">{note.label}</dt>
+                    <dd>{note.value}</dd>
+                  </div>
+                ))}
+              </dl>
               <div className="show-actions">
-                <Magnetic>
                   <a className="modal-link mono" href={p.href} target="_blank" rel="noreferrer">
                     {p.linkLabel} ↗
                   </a>
-                </Magnetic>
               </div>
             </div>
             <div className="g-stage">

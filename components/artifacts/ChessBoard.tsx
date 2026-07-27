@@ -55,7 +55,7 @@ export default function ChessBoard() {
         </div>
       </div>
       <p className="artifact-caption mono">
-        a real knight · {moves} move{moves === 1 ? "" : "s"} · click a lit square
+        playable knight · {moves} move{moves === 1 ? "" : "s"} · click or tab to a lit square
       </p>
     </div>
   );

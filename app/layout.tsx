@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Archivo, Newsreader, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import BackgroundWash from "@/components/BackgroundWash";
-import FluidTrail from "@/components/FluidTrail";
+import FluidSim from "@/components/FluidSim";
+import Preloader from "@/components/Preloader";
+import Cursor from "@/components/Cursor";
 import GsapProvider from "@/components/GsapProvider";
 import { site } from "@/lib/content";
 import { siteUrl } from "@/lib/site-url";
@@ -62,8 +64,10 @@ export default function RootLayout({
         <a href="#content" className="skip-link mono">
           skip to content
         </a>
+        <Preloader />
         <BackgroundWash />
-        <FluidTrail />
+        <FluidSim />
+        <Cursor />
         <GsapProvider />
         <div className="grain" aria-hidden="true" />
         {children}

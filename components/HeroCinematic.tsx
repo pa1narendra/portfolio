@@ -32,28 +32,47 @@ export default function HeroCinematic() {
     const el = ref.current;
     if (!el) return;
     const mm = gsap.matchMedia();
+    // first visit waits for the boot greeting (or its skip); revisits enter right away
+    const revisit = sessionStorage.getItem("pnp.visited") === "1";
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       const letters = el.querySelectorAll(".hero-h .lt");
       const rest = el.querySelectorAll(".hero-kicker, .status-strip");
+      gsap.set(letters, { yPercent: 120 });
+      gsap.set(rest, { y: 34, opacity: 0 });
 
-      // Brief entrance, without delaying access to the portfolio.
-      gsap.fromTo(
-        letters,
-        { yPercent: 120 },
-        {
+      let started = false;
+      const enter = () => {
+        if (started) return;
+        started = true;
+        gsap.to(letters, {
           yPercent: 0,
           duration: 1.15,
           ease: "power4.out",
           stagger: 0.028,
-          delay: 0.12,
+          delay: 0.15,
           onComplete: () => el.classList.add("unmasked"),
-        },
-      );
-      gsap.fromTo(
-        rest,
-        { y: 34, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", stagger: 0.1, delay: 0.35 },
-      );
+        });
+        gsap.to(rest, {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: "power3.out",
+          stagger: 0.1,
+          delay: 0.45,
+        });
+      };
+
+      if (revisit) {
+        enter();
+        return;
+      }
+      // enter when the boot finishes or is skipped; timeout is a safety net
+      window.addEventListener("pnp:boot-done", enter);
+      const fallback = setTimeout(enter, 4400);
+      return () => {
+        window.removeEventListener("pnp:boot-done", enter);
+        clearTimeout(fallback);
+      };
     });
 
     return () => mm.revert();

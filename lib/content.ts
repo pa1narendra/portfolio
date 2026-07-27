@@ -47,7 +47,7 @@ export const log: { entries: LogEntry[] } = {
 
 export interface Project {
   id: string; code: string; name: string; tagline: string; description: string;
-  stack: string; href: string; linkLabel: string;
+  stack: string; href: string; linkLabel: string; caseHref?: string;
   fieldNotes: { label: string; value: string }[];
 }
 
@@ -71,6 +71,7 @@ export const projects: Project[] = [
     description: "A voice-first mock interviewer that asks adaptive follow-ups and produces a scored report when the conversation ends.",
     stack: "Next.js \u00b7 TypeScript \u00b7 Gemini Live \u00b7 Postgres \u00b7 Drizzle",
     href: "https://mockstar-ai.vercel.app", linkLabel: "try the interview",
+    caseHref: "/work/mockstar",
     fieldNotes: [
       { label: "constraint", value: "Conversation latency must feel natural, not queued." },
       { label: "decision", value: "Streaming voice and transcript state share one session model." },

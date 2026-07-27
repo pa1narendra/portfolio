@@ -1831,3 +1831,371 @@ h3 {
     padding: 1rem;
   }
 }
+
+/* ————— case-study pages ————— */
+.case-page {
+  padding-top: 6rem;
+  padding-bottom: 5rem;
+}
+
+.case-crumb {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  margin-bottom: 3rem;
+}
+
+.case-hero {
+  margin-bottom: 1rem;
+}
+
+.case-title {
+  font-size: clamp(3rem, 9vw, 6.5rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 1rem 0 0.75rem;
+}
+
+.case-tagline {
+  font-size: clamp(1.375rem, 2.4vw, 1.875rem);
+  color: var(--muted);
+  max-width: 38rem;
+  line-height: 1.35;
+}
+
+.case-meta {
+  margin-top: 2.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 1.25rem 2rem;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 1.25rem 0;
+  max-width: 56rem;
+}
+
+.case-meta dt {
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.375rem;
+}
+
+.case-meta dd {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--fg);
+}
+
+.case-links {
+  margin-top: 1.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.case-section {
+  padding: clamp(2.5rem, 6vh, 4rem) 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.case-section:first-of-type {
+  border-top: none;
+}
+
+.case-label {
+  margin-bottom: 1.75rem;
+}
+
+.case-outcome {
+  font-size: clamp(1.25rem, 2.2vw, 1.625rem);
+  line-height: 1.55;
+  color: var(--fg);
+  max-width: 46rem;
+}
+
+.case-prose {
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+  max-width: 44rem;
+}
+
+.case-prose p {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.case-prose-lede {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--muted);
+  max-width: 42rem;
+  margin-bottom: 2rem;
+}
+
+/* constraints */
+.case-constraints {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 44rem;
+}
+
+.case-constraints li {
+  display: flex;
+  gap: 1.25rem;
+  align-items: baseline;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--fg);
+  border-left: 2px solid var(--accent);
+  padding: 0.5rem 0 0.5rem 1.25rem;
+}
+
+.constraint-mark {
+  font-size: 0.6875rem;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* architecture flow */
+.arch-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 1.75rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.arch-step-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.arch-step {
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  padding: 0.7rem 1rem;
+  border: 1px solid rgba(25, 24, 32, 0.3);
+  background: var(--obj-bg);
+  color: var(--obj-fg);
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.arch-arrow {
+  color: var(--accent);
+  font-size: 1rem;
+}
+
+.arch-notes {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.arch-notes li {
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  padding-left: 1.25rem;
+  position: relative;
+}
+
+.arch-notes li::before {
+  content: "†";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+/* decisions */
+.case-decisions {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 48rem;
+}
+
+.case-decision {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.4);
+  padding: 1.75rem 1.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.decision-situation {
+  font-family: var(--font-newsreader), Georgia, serif;
+  font-style: italic;
+  font-size: 1.1875rem;
+  line-height: 1.5;
+  color: var(--fg);
+}
+
+.decision-choice,
+.decision-tradeoff {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+.decision-tag {
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-right: 0.375rem;
+}
+
+/* edge cases — the signature section */
+.case-edges {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
+  gap: 1.25rem;
+}
+
+.case-edge {
+  border: 1px solid rgba(25, 24, 32, 0.3);
+  background: var(--obj-bg-2);
+  color: var(--obj-fg);
+  padding: 1.5rem;
+}
+
+.edge-name {
+  font-size: 0.8125rem;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+
+.edge-handling {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--obj-muted);
+}
+
+/* results */
+.case-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr));
+  gap: 2rem;
+  max-width: 56rem;
+}
+
+.case-result {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.result-value {
+  font-family: var(--font-archivo), sans-serif;
+  font-weight: 800;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1;
+  color: var(--fg);
+}
+
+.result-label {
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 12rem;
+}
+
+/* reflection */
+.case-reflection p {
+  font-size: 1.25rem;
+  line-height: 1.55;
+  color: var(--fg);
+}
+
+/* media */
+.case-media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+  gap: 1.5rem;
+}
+
+.case-figure {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.case-shot {
+  border: 1px solid var(--line);
+  background: var(--obj-bg);
+  padding: 0.625rem;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.case-img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  display: block;
+}
+
+.case-caption {
+  font-size: 0.6875rem;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.case-footer {
+  border-top: 1px solid var(--line);
+  padding-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.8125rem;
+}
+
+.case-next {
+  display: flex;
+  gap: 1.75rem;
+}
+
+@media (max-width: 56rem) {
+  .case-page {
+    padding-top: 5rem;
+  }
+  .arch-flow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .arch-step {
+    white-space: normal;
+    text-align: center;
+  }
+  .arch-step-wrap {
+    flex-direction: column;
+  }
+  .arch-arrow {
+    transform: rotate(90deg);
+  }
+}
+
+.show-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.case-link {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+}

@@ -104,9 +104,14 @@ export default function WorkGallery({ artifacts }: { artifacts: Record<string, R
                 ))}
               </dl>
               <div className="show-actions">
-                  <a className="modal-link mono" href={p.href} target="_blank" rel="noreferrer">
-                    {p.linkLabel} ↗
+                <a className="modal-link mono" href={p.href} target="_blank" rel="noreferrer">
+                  {p.linkLabel} ↗
+                </a>
+                {p.caseHref && (
+                  <a className="u-link mono case-link" href={p.caseHref}>
+                    read the case study →
                   </a>
+                )}
               </div>
             </div>
             <div className="g-stage">

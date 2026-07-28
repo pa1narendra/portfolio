@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { caseStudies, getCaseStudy } from "@/lib/case-studies";
+import { caseStudies, getCaseStudy, type CaseMedia, type CasePlacement, type CaseStudy } from "@/lib/case-studies";
 import Reveal from "@/components/Reveal";
 
 export function generateStaticParams() {
@@ -38,6 +38,32 @@ function CaseSection({
         {children}
       </Reveal>
     </section>
+  );
+}
+
+// Screenshots live next to the section that talks about them,
+// not in one big pile.
+function Shots({ cs, at }: { cs: CaseStudy; at: CasePlacement }) {
+  const shots = cs.media.filter((m: CaseMedia) => m.placement === at);
+  if (shots.length === 0) return null;
+  return (
+    <div className="case-media-grid">
+      {shots.map((m) => (
+        <figure key={m.src} className="case-figure">
+          <div className="case-shot">
+            <Image
+              src={m.src}
+              alt={m.alt}
+              width={m.width}
+              height={m.height}
+              sizes="(max-width: 899px) 100vw, 50vw"
+              className="case-img"
+            />
+          </div>
+          <figcaption className="mono case-caption">{m.caption}</figcaption>
+        </figure>
+      ))}
+    </div>
   );
 }
 
@@ -96,29 +122,8 @@ export default async function CaseStudyPage({
 
       <CaseSection label="what it is">
         <p className="case-outcome">{cs.outcome}</p>
+        <Shots cs={cs} at="outcome" />
       </CaseSection>
-
-      {cs.media.length > 0 && (
-        <CaseSection label="the product">
-          <div className="case-media-grid">
-            {cs.media.map((m) => (
-              <figure key={m.src} className="case-figure">
-                <div className="case-shot">
-                  <Image
-                    src={m.src}
-                    alt={m.alt}
-                    width={m.width}
-                    height={m.height}
-                    sizes="(max-width: 899px) 100vw, 50vw"
-                    className="case-img"
-                  />
-                </div>
-                <figcaption className="mono case-caption">{m.caption}</figcaption>
-              </figure>
-            ))}
-          </div>
-        </CaseSection>
-      )}
 
       <CaseSection label="why it exists">
         <div className="case-prose">
@@ -126,6 +131,7 @@ export default async function CaseStudyPage({
             <p key={i}>{p}</p>
           ))}
         </div>
+        <Shots cs={cs} at="problem" />
       </CaseSection>
 
       <CaseSection label="the constraints">
@@ -137,6 +143,7 @@ export default async function CaseStudyPage({
             </li>
           ))}
         </ul>
+        <Shots cs={cs} at="constraints" />
       </CaseSection>
 
       <CaseSection label="how it works">
@@ -160,6 +167,7 @@ export default async function CaseStudyPage({
             </li>
           ))}
         </ul>
+        <Shots cs={cs} at="architecture" />
       </CaseSection>
 
       <CaseSection label="decisions that mattered">
@@ -176,6 +184,7 @@ export default async function CaseStudyPage({
             </article>
           ))}
         </div>
+        <Shots cs={cs} at="decisions" />
       </CaseSection>
 
       <CaseSection label="the edge cases">
@@ -190,6 +199,7 @@ export default async function CaseStudyPage({
             </div>
           ))}
         </div>
+        <Shots cs={cs} at="edges" />
       </CaseSection>
 
       <CaseSection label="in numbers">
@@ -201,6 +211,7 @@ export default async function CaseStudyPage({
             </div>
           ))}
         </div>
+        <Shots cs={cs} at="results" />
       </CaseSection>
 
       <CaseSection label="looking back">
@@ -209,6 +220,7 @@ export default async function CaseStudyPage({
             <p key={i}>{p}</p>
           ))}
         </div>
+        <Shots cs={cs} at="reflection" />
       </CaseSection>
 
       <footer className="case-footer">

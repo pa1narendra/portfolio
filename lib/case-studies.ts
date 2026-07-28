@@ -1,12 +1,25 @@
 // Case-study content. One entry per project; pages render from this file
 // so the writing lives in one place, like lib/content.ts.
 
+// Where a shot appears on the page: right after the section that
+// actually talks about the feature it shows.
+export type CasePlacement =
+  | "outcome"
+  | "problem"
+  | "constraints"
+  | "architecture"
+  | "decisions"
+  | "edges"
+  | "results"
+  | "reflection";
+
 export interface CaseMedia {
   src: string; // under /public
   alt: string;
   caption: string;
   width: number;
   height: number;
+  placement: CasePlacement;
 }
 
 export interface CaseDecision {
@@ -185,6 +198,7 @@ export const caseStudies: CaseStudy[] = [
         caption: "the dashboard. one button, and it talks to you",
         width: 1920,
         height: 951,
+        placement: "outcome",
       },
       {
         src: "/work/mockstar/setup-target-job.png",
@@ -192,6 +206,7 @@ export const caseStudies: CaseStudy[] = [
         caption: "target a job: paste the posting, add your resume, and the questions come from what the job actually needs",
         width: 1920,
         height: 943,
+        placement: "outcome",
       },
       {
         src: "/work/mockstar/setup-quick-practice.png",
@@ -199,13 +214,55 @@ export const caseStudies: CaseStudy[] = [
         caption: "or skip the ceremony, quick practice needs just a role",
         width: 1920,
         height: 943,
+        placement: "outcome",
+      },
+      {
+        src: "/work/mockstar/interviews.png",
+        alt: "List of the user's interviews with dates, scores, and attempt counts",
+        caption: "the limits are visible, not hidden: three attempts per interview, scores kept honestly",
+        width: 1920,
+        height: 933,
+        placement: "constraints",
+      },
+      {
+        src: "/work/mockstar/report-score.png",
+        alt: "Interview report showing a 0 out of 100 overall score with per-category explanations",
+        caption: "the five schema-enforced categories in action, on a run I deliberately failed by answering in Italian. it gave me the zero I deserved, with reasons",
+        width: 1920,
+        height: 946,
+        placement: "decisions",
+      },
+      {
+        src: "/work/mockstar/report-actions.png",
+        alt: "Report footer with full transcript, strengths, improve-next suggestions, PDF download, and retake",
+        caption: "the save-first pipeline from the user's side: the transcript is always there, and a report can always be retried",
+        width: 1920,
+        height: 960,
+        placement: "decisions",
+      },
+      {
+        src: "/work/mockstar/progress.png",
+        alt: "Progress chart tracking overall score and per-category trends across scored interviews",
+        caption: "the numbers as the user sees them: progress across attempts, tracked per category",
+        width: 1920,
+        height: 941,
+        placement: "results",
+      },
+      {
+        src: "/work/mockstar/report-coverage.png",
+        alt: "Job requirements coverage section listing which job description requirements were proven or still unproven",
+        caption: "coverage maps your answers back to the job description, requirement by requirement, including what is still unproven",
+        width: 1920,
+        height: 941,
+        placement: "results",
       },
       {
         src: "/work/mockstar/community.png",
         alt: "Community interview templates with role, style, and tech stack tags",
-        caption: "community templates, pick one and personalize it to your resume",
+        caption: "community templates already point at the next step: one person's interview becoming something others reuse",
         width: 1920,
         height: 949,
+        placement: "reflection",
       },
       {
         src: "/work/mockstar/personalize.png",
@@ -213,41 +270,7 @@ export const caseStudies: CaseStudy[] = [
         caption: "personalizing a template, the same role asks different questions once it has read your resume",
         width: 1920,
         height: 943,
-      },
-      {
-        src: "/work/mockstar/interviews.png",
-        alt: "List of the user's interviews with dates, scores, and attempt counts",
-        caption: "your interviews, three attempts each, scores kept honestly",
-        width: 1920,
-        height: 933,
-      },
-      {
-        src: "/work/mockstar/progress.png",
-        alt: "Progress chart tracking overall score and per-category trends across scored interviews",
-        caption: "progress across attempts, tracked per category",
-        width: 1920,
-        height: 941,
-      },
-      {
-        src: "/work/mockstar/report-score.png",
-        alt: "Interview report showing a 0 out of 100 overall score with per-category explanations",
-        caption: "a report from a run I deliberately failed by answering in Italian. it gave me the zero I deserved, with reasons",
-        width: 1920,
-        height: 946,
-      },
-      {
-        src: "/work/mockstar/report-coverage.png",
-        alt: "Job requirements coverage section listing which job description requirements were proven or still unproven",
-        caption: "coverage maps your answers back to the job description, requirement by requirement",
-        width: 1920,
-        height: 941,
-      },
-      {
-        src: "/work/mockstar/report-actions.png",
-        alt: "Report footer with full transcript, strengths, improve-next suggestions, PDF download, and retake",
-        caption: "every report ends with what to do next: transcript, weak areas, a retake, or a PDF",
-        width: 1920,
-        height: 960,
+        placement: "reflection",
       },
       {
         src: "/work/mockstar/sign-in.png",
@@ -255,6 +278,7 @@ export const caseStudies: CaseStudy[] = [
         caption: "the front door, live at mockstar-ai.vercel.app",
         width: 1920,
         height: 994,
+        placement: "reflection",
       },
     ],
   },

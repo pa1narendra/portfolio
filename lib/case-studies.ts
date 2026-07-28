@@ -414,6 +414,137 @@ export const caseStudies: CaseStudy[] = [
     ],
     media: [],
   },
+  {
+    slug: "chessing",
+    name: "Chessing",
+    tagline: "multiplayer chess that distrusts the client",
+    seoDescription:
+      "How I built Chessing, a server-authoritative multiplayer chess app in Flutter and Bun: clocks that survive disconnects, matchmaking that never starves, and why it is still unreleased.",
+    role: "solo, design to release candidate",
+    period: "dec 2025 · in testing through 2026",
+    status: "feature-complete, unreleased while testing",
+    stack: [
+      "Flutter",
+      "Dart",
+      "Bun",
+      "Elysia",
+      "TypeScript",
+      "MongoDB",
+      "WebSockets",
+    ],
+    links: [{ label: "Inspect the code", href: "https://github.com/pa1narendra/chess-mobile" }],
+    outcome:
+      "A complete multiplayer chess app: quick play with rating-windowed matchmaking, six-digit invite codes, friend challenges, rematches, in-game chat, offline bots, puzzles, post-game analysis, and Glicko-2 ratings. The one rule underneath all of it: the server owns the truth, and the phone in your hand only gets to propose.",
+    problem: [
+      "Chessing started as a web experiment, and I rebuilt it as an Android app because the question I actually cared about had changed. It was no longer 'can I make chess work', it was 'how does a real-time game stay consistent when the clients lie, lag, and vanish mid-move'. Phones are the honest test of that, because phone connections fail constantly and phone users close apps without warning.",
+      "So every feature in the app is really the same feature: two devices that cannot be trusted, one server that arbitrates, and a game that has to feel instant anyway.",
+    ],
+    constraints: [
+      "Nothing the client says is believed. Identity comes from the verified token, never from the message, and the server re-derives your color, your turn, and your clock before a move counts.",
+      "A dropped socket must not decide a game, in either direction. Disconnecting cannot be a free escape when you are losing, and a blameless network blip should not instantly forfeit you.",
+      "A small playerbase is the realistic case, so matchmaking has to produce a game even when almost nobody is online.",
+      "Ratings have to survive people: farming the same friend, rage-quitting move one, guests with no account.",
+      "It has to work with no account and no network at all, which is what the guest mode and the offline bots are for.",
+    ],
+    architecture: {
+      intro:
+        "The Flutter client and the Bun server both run a full rules engine. The client's copy exists for instant feedback, the server's copy is the referee: every move a phone proposes is re-validated on the server against its own board before anyone sees it.",
+      flow: [
+        "flutter client · proposes",
+        "websocket · json + jwt",
+        "server · re-validates all",
+        "memory · live game state",
+        "mongodb · write-behind",
+        "glicko-2 · on game end",
+      ],
+      notes: [
+        "22 client message types, rate-limited to 60 a minute per connection",
+        "a move is checked in order: real player, your turn, clock not expired, legal on the server's board",
+        "offline bots are a pure Dart minimax with five difficulty depths, run in a background isolate so the UI never stutters",
+        "invite codes are six digits because they get read out loud across a room",
+      ],
+    },
+    decisions: [
+      {
+        situation:
+          "Phone sockets drop all the time, and the oldest multiplayer exploit is yanking the cable the moment you start losing.",
+        decision:
+          "Disconnection pauses the connection, never the chess clock. A dropped player gets a 60 second grace window to come back, but their time keeps burning the whole while, and the opponent is told exactly what is happening.",
+        tradeoff:
+          "A genuinely blameless network failure can cost you a winning position. I chose that over the alternative, where every losing player suddenly develops connection problems.",
+      },
+      {
+        situation:
+          "Rating-windowed matchmaking starves on a small playerbase. Strict fairness means an empty queue that never pops.",
+        decision:
+          "The window expands with waiting time, from ±100 rating out to anyone within 30 seconds, and if exactly one other person is waiting with your time control, you get matched regardless, because a lopsided game beats no game. A memory of your last three opponents keeps it from feeding you the same friend over and over.",
+        tradeoff:
+          "Early users get uneven games and noisier rating updates. That is the correct price for a queue that always answers.",
+      },
+      {
+        situation:
+          "A mis-tap or an instant quit in the first seconds of a game was costing people rating points over nothing.",
+        decision:
+          "Leaving before the second half-move aborts the game instead of resigning it, and aborted games never touch ratings. The button in the client literally changes its label from abort to resign at that boundary.",
+        tradeoff:
+          "It hands out a free two-ply peek at an opponent's rating and opening with no penalty. I know, and I took it, because punishing mis-taps felt worse than tolerating peeking.",
+      },
+      {
+        situation:
+          "Every move needs to feel instant, and a database round-trip in the hot path is where that dies.",
+        decision:
+          "The authoritative live game state lives in server memory, and MongoDB trails behind it as a write-behind mirror: each move appends to the record after the players have already seen the board update.",
+        tradeoff:
+          "A server restart voids every in-flight game, because reconnection reads memory, not the database. That is a real limitation, I say so plainly, and fixing it is on the release-blocker list below.",
+      },
+    ],
+    edgeCases: [
+      {
+        name: "the losing player pulls the plug",
+        handling:
+          "The clock keeps running through the disconnect. Come back inside 60 seconds and the game continues, run out of time while gone and you lose on time, stay gone past the grace window and you forfeit by disconnection. There is no free exit.",
+      },
+      {
+        name: "coming back mid-game",
+        handling:
+          "The client remembers its game and color locally, reconnects with exponential backoff from 1 to 16 seconds, and asks to rejoin. The server restores the board, the history, and both clocks from its authoritative state, and tells your opponent you are back.",
+      },
+      {
+        name: "two moves racing each other",
+        handling:
+          "Every incoming move re-checks seat, turn, clock, and legality against the server's board in that order, so when two frames race, the second one simply fails the turn check and gets an error instead of corrupting the game.",
+      },
+      {
+        name: "accepting your own draw offer",
+        handling:
+          "Draw handling checks who offered before it checks anything else: no offer on the table, or an offer from your own color, and the accept is refused. Same family of guard as challenging yourself or accepting your own rematch, all of which are explicitly rejected.",
+      },
+      {
+        name: "the timer that fires early",
+        handling:
+          "Timeout handling does not trust its own timer. When it fires, the server recomputes actual elapsed time, and if the player still has more than 100 ms it re-arms instead of ending the game, so a scheduling hiccup can never flag someone who had time left.",
+      },
+      {
+        name: "a guest wins against a rated player",
+        handling:
+          "Rating updates run only when both sides are real account holders, checked by id shape before the math. Guests can play everything, but they cannot inflate, deflate, or farm anyone's Glicko-2 number.",
+      },
+    ],
+    results: [
+      { value: "22", label: "websocket message types, all validated server-side" },
+      { value: "60s", label: "of grace after a dropped socket, clock still running" },
+      { value: "2", label: "plies, the line between an abort and a resignation" },
+      { value: "±100→∞", label: "matchmaking window, expanding over 30 seconds" },
+      { value: "5", label: "bot depths, pure Dart minimax in a background isolate" },
+      { value: "0", label: "releases so far, honestly, and here is why" },
+    ],
+    reflection: [
+      "The zero releases line is deliberate. The engineering I am proud of is real, and so are the reasons it is not released: live games sit in server memory, so a restart or crash quietly voids them, there are no real tests around the hardest code, and tap-to-move still cannot promote a pawn. Those are the release blockers, written down, and shipping before they are fixed would contradict everything else on this page.",
+      "What Chessing taught me is that server-authoritative is a mindset, not a feature. Once you decide the client only proposes, every design question answers itself the same way: what does the server know, and what can it prove.",
+      "Next: persistence for live games, a test corpus around the game manager, and then a signed APK through the same release pipeline MoneyCap already uses.",
+    ],
+    media: [],
+  },
 ];
 
 export const getCaseStudy = (slug: string) =>

@@ -58,10 +58,11 @@ export const projects: Project[] = [
     description: "Originally a web app, Chessing is now an unreleased Android rewrite exploring server-authoritative multiplayer, reconnect recovery, ranked matches, invite codes, and offline bots. Its planned features are implemented, but the complete build is still being tested.",
     stack: "unreleased / in testing \u00b7 Flutter \u00b7 Bun \u00b7 Elysia \u00b7 MongoDB \u00b7 WebSockets",
     href: "https://github.com/pa1narendra/chess-mobile", linkLabel: "inspect the code",
+    caseHref: "/work/chessing",
     fieldNotes: [
       { label: "evolution", value: "The original web app became a Flutter Android client with a Bun and Elysia backend." },
       { label: "decision", value: "The server validates every move; the client only proposes it." },
-      { label: "failure mode", value: "Persisted state restores interrupted matches." },
+      { label: "failure mode", value: "A dropped socket gets a 60-second grace window; the chess clock keeps running." },
       { label: "status", value: "Feature-complete for the planned scope, but unreleased while testing continues." },
     ],
   },

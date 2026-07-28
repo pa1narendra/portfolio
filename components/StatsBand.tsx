@@ -21,8 +21,8 @@ function Stat({ value, label }: { value: string; label: string }) {
     const el = ref.current;
     if (!el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setN(target);
-      return;
+      const id = setTimeout(() => setN(target), 0);
+      return () => clearTimeout(id);
     }
     const io = new IntersectionObserver(
       ([e]) => {

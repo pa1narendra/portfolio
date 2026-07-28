@@ -86,6 +86,7 @@ export const projects: Project[] = [
     description: "An offline-first expense tracker that converts bank SMS messages into ledger entries without manual input or transaction data leaving the device.",
     stack: "Flutter \u00b7 SQLite \u00b7 on-device parsing \u00b7 GitHub Actions",
     href: "https://github.com/pa1narendra/MoneyCap/releases/latest", linkLabel: "get the release",
+    caseHref: "/work/moneycap",
     fieldNotes: [
       { label: "constraint", value: "Financial messages should never reach a server." },
       { label: "decision", value: "Parsing and storage both run locally." },

@@ -107,8 +107,9 @@ export default async function CaseStudyPage({
                   <Image
                     src={m.src}
                     alt={m.alt}
-                    width={640}
-                    height={1280}
+                    width={m.width}
+                    height={m.height}
+                    sizes="(max-width: 899px) 100vw, 50vw"
                     className="case-img"
                   />
                 </div>

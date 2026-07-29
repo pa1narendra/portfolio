@@ -15,8 +15,8 @@ const SIM_RES = 160;
 // the surface is a damped wave membrane: a disturbance detaches from the
 // cursor and travels on its own physics — blooming, interfering, melting.
 const WAVE_SPEED = 18; // texels/s — how fast a disturbance travels (slow = thick)
-const VEL_DAMP = 1.25; // 1/s — the oil eats the wave's energy
-const DENT_DECAY = 0.5; // 1/s — the surface itself pulls flat
+const VEL_DAMP = 2.5; // 1/s — the oil eats the wave's energy
+const DENT_DECAY = 1.0; // 1/s — the surface itself pulls flat
 const SPLAT_RADIUS = 0.003; // disturbance width at the point of contact (~70% of before)
 const SPLAT_PUSH = 6.5; // dent strength per unit of pointer motion
 const MAX_DENT = 1.0; // hard cap on field magnitude — oil never overshoots
@@ -93,15 +93,15 @@ void main(){
   float t = uTime * 0.05;
   // refraction with a slight chromatic split, like light through glass
   vec3 col;
-  col.r = wash(vUv - dent * distort * 1.25, t).r;
-  col.g = wash(vUv - dent * distort,        t).g;
-  col.b = wash(vUv - dent * distort * 0.75, t).b;
+  col.r = wash(vUv - dent * distort * 1.1, t).r;
+  col.g = wash(vUv - dent * distort,       t).g;
+  col.b = wash(vUv - dent * distort * 0.9, t).b;
   // thin-film sheen: pearlescent color that lives where the dent is,
   // trails the disturbance and melts away with it
   float m = length(dent);
   float film = smoothstep(0.006, 0.4, m);
   vec3 rainbow = vec3(0.5) + 0.5 * cos(6.28318 * (m * 1.4 + vec3(0.00, 0.33, 0.67)) + uTime * 0.15);
-  vec3 sheen = mix(vec3(0.93, 0.92, 0.94), rainbow, 0.45); // pearl, not neon
+  vec3 sheen = mix(vec3(0.93, 0.92, 0.94), rainbow, 0.18); // pearl with a hint of color
   col = mix(col, sheen, film * 0.14);
   o = vec4(col, 1.0);
 }`,

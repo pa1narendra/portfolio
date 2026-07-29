@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { log } from "@/lib/content";
 
 // The log replays itself as a git history when it scrolls into view.
+// Each message streams in character by character, like a live response,
+// instead of whole lines dropping in.
 const fakeHash = (s: string) => {
   let h = 2166136261;
   for (const c of s) {
@@ -13,16 +15,28 @@ const fakeHash = (s: string) => {
   return (h >>> 0).toString(16).padStart(8, "a").slice(0, 7);
 };
 
+// ghost characters appended to each line's budget: a beat of silence
+// between one commit finishing and the next starting to type
+const LINE_PAUSE = 14;
+
 export default function GitLog() {
-  const [shown, setShown] = useState(0);
+  const [chars, setChars] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
-  const total = log.entries.length;
+
+  // cumulative char offset at which each line starts typing
+  const offsets: number[] = [];
+  let acc = 0;
+  for (const e of log.entries) {
+    offsets.push(acc);
+    acc += e.text.length + LINE_PAUSE;
+  }
+  const total = acc;
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      const t = setTimeout(() => setShown(total + 1), 0);
+      const t = setTimeout(() => setChars(total + 1), 0);
       return () => clearTimeout(t);
     }
     let timer: ReturnType<typeof setInterval> | null = null;
@@ -30,15 +44,16 @@ export default function GitLog() {
       ([e]) => {
         if (e.isIntersecting && !timer) {
           io.disconnect();
+          // 2-4 chars every 24ms — streaming speed, with a little jitter
           timer = setInterval(() => {
-            setShown((s) => {
-              if (s >= total + 1) {
+            setChars((c) => {
+              if (c > total) {
                 if (timer) clearInterval(timer);
-                return s;
+                return c;
               }
-              return s + 1;
+              return c + 2 + Math.floor(Math.random() * 3);
             });
-          }, 480);
+          }, 24);
         }
       },
       { threshold: 0.3 },
@@ -50,6 +65,8 @@ export default function GitLog() {
     };
   }, [total]);
 
+  const done = chars > total;
+
   return (
     <div className="term" ref={ref}>
       <div className="term-bar">
@@ -59,19 +76,25 @@ export default function GitLog() {
         <span className="term-title mono">~/pavan — git log --oneline --reverse</span>
       </div>
       <div className="term-body mono">
-        {log.entries.slice(0, shown).map((e, i) => (
-          <p className="term-line" key={e.id}>
-            <span className="term-hash">{fakeHash(e.id)}</span>
-            <span className="term-date">{e.date}</span>
-            <span className="term-msg">
-              {e.text}
-              {i === total - 1 && shown > total - 1 && (
-                <span className="term-head"> ← HEAD</span>
-              )}
-            </span>
-          </p>
-        ))}
-        {shown > total && (
+        {log.entries.map((e, i) => {
+          const typed = Math.max(0, Math.min(chars - offsets[i], e.text.length));
+          if (chars < offsets[i]) return null;
+          const typing = !done && typed < e.text.length;
+          return (
+            <p className="term-line" key={e.id}>
+              <span className="term-hash">{fakeHash(e.id)}</span>
+              <span className="term-date">{e.date}</span>
+              <span className="term-msg">
+                {e.text.slice(0, typed)}
+                {typing && <span className="caret" aria-hidden="true" />}
+                {i === log.entries.length - 1 && typed >= e.text.length && (
+                  <span className="term-head"> ← HEAD</span>
+                )}
+              </span>
+            </p>
+          );
+        })}
+        {done && (
           <p className="term-line term-prompt">
             <span className="term-hash">$</span>
             <span className="term-msg">

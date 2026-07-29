@@ -194,11 +194,19 @@ export default function FluidSim() {
     resize();
     window.addEventListener("resize", resize);
 
-    const pointer = { x: 0.5, y: 0.5, px: 0.5, py: 0.5, moved: false };
+    // raw pointer + an eased follower: the trail is laid along the smooth
+    // lagged path, not the jittery raw one — that is what makes it buttery
+    const pointer = { x: 0.5, y: 0.5, seen: false };
+    const smooth = { x: 0.5, y: 0.5, px: 0.5, py: 0.5, live: false };
     const onMove = (e: PointerEvent) => {
       pointer.x = e.clientX / window.innerWidth;
       pointer.y = 1 - e.clientY / window.innerHeight;
-      pointer.moved = true;
+      if (!smooth.live) {
+        smooth.live = true;
+        smooth.x = smooth.px = pointer.x;
+        smooth.y = smooth.py = pointer.y;
+      }
+      pointer.seen = true;
     };
     window.addEventListener("pointermove", onMove);
 
@@ -224,27 +232,32 @@ export default function FluidSim() {
       last = now;
 
       stir = Math.max(0, stir - stir * STIR_DECAY * dt);
-      if (pointer.moved) {
-        pointer.moved = false;
-        const dx = pointer.x - pointer.px;
-        const dy = pointer.y - pointer.py;
+      if (smooth.live) {
+        // ease the follower toward the raw pointer; the lag is the grace
+        const k = 1 - Math.exp(-9 * dt);
+        smooth.x += (pointer.x - smooth.x) * k;
+        smooth.y += (pointer.y - smooth.y) * k;
+        const dx = smooth.x - smooth.px;
+        const dy = smooth.y - smooth.py;
         const dist = Math.hypot(dx, dy);
-        if (dist > 0.0003) {
+        if (dist > 0.00015) {
           stir = Math.min(1, stir + dist * STIR_CHARGE);
           const push = SPLAT_PUSH * (STIR_FLOOR + (1 - STIR_FLOOR) * stir);
-          const steps = Math.min(10, Math.max(1, Math.ceil(dist * 120)));
+          // lay dents so densely along the eased path that they read as one
+          // continuous stroke, never a row of stamps
+          const steps = Math.min(28, Math.max(1, Math.ceil(dist / (Math.sqrt(SPLAT_RADIUS) * 0.35))));
           for (let i = 1; i <= steps; i++) {
             const t = i / steps;
             dent(
-              pointer.px + dx * t,
-              pointer.py + dy * t,
+              smooth.px + dx * t,
+              smooth.py + dy * t,
               (dx / dist) * push * Math.min(dist * 8, 1),
               (dy / dist) * push * Math.min(dist * 8, 1),
             );
           }
         }
-        pointer.px = pointer.x;
-        pointer.py = pointer.y;
+        smooth.px = smooth.x;
+        smooth.py = smooth.y;
       }
 
       // the only ongoing process: the oil settling back to flat

@@ -12,12 +12,12 @@ import { useEffect, useRef } from "react";
 // Desktop-only; reduced-motion and touch devices keep the static washes.
 
 const SIM_RES = 160;
-const DECAY = 2.0; // 1/s — how fast the oil pulls itself flat again
-const DIFFUSE = 0.24; // how much a dent oozes into its neighbors per frame
-const SPLAT_RADIUS = 0.0045; // the dent is barely wider than the cursor
-const SPLAT_PUSH = 5.5; // dent strength per unit of pointer motion
+const DECAY = 1.5; // 1/s — the trail lingers a moment, then pulls flat
+const DIFFUSE = 0.22; // how much a dent oozes into its neighbors per frame
+const SPLAT_RADIUS = 0.006; // trail width, a little wider than the cursor
+const SPLAT_PUSH = 6.5; // dent strength per unit of pointer motion
 const MAX_DENT = 1.0; // hard cap on field magnitude — oil never overshoots
-const DISTORT = 0.011; // max warp at full dent, a small fraction of the screen
+const DISTORT = 0.016; // max warp at full dent, a small fraction of the screen
 // the dent charges with sustained movement: a flick barely marks the surface
 const STIR_CHARGE = 22;
 const STIR_DECAY = 3.0;
@@ -57,8 +57,11 @@ void main(){
   if (m > maxDent) settled *= maxDent / m;
   o = vec4(settled, 0., 1.);
 }`,
-  // pure displacement of the pastel field — no derivative shading, so the
-  // sim grid can never print artifacts
+  // the visible part: the dent field refracts the wash with a slight
+  // chromatic split, and where the surface is disturbed a thin oil-film
+  // sheen appears (lusion-style trail). The field is smooth, clamped and
+  // linearly filtered, and no derivative of it is ever shaded, so the sim
+  // grid can never print artifacts.
   display: `#version 300 es
 precision highp float;
 in vec2 vUv; out vec4 o;
@@ -68,10 +71,7 @@ float blob(vec2 uv, vec2 c, float r){
   vec2 d = uv - c; d.x *= aspect;
   return smoothstep(r, 0.0, length(d));
 }
-void main(){
-  vec2 dent = texture(uField, vUv).xy;
-  vec2 uv = vUv - dent * distort;
-  float t = uTime * 0.05;
+vec3 wash(vec2 uv, float t){
   vec2 c1 = vec2(0.13 + 0.05*sin(t),      0.84 + 0.04*cos(t*0.8));
   vec2 c2 = vec2(0.88 + 0.06*cos(t*0.7),  0.14 + 0.05*sin(t*0.9));
   vec2 c3 = vec2(0.70 + 0.04*sin(t*1.15), 0.60 + 0.06*cos(t*0.6));
@@ -79,6 +79,23 @@ void main(){
   col = mix(col, vec3(0.830, 0.808, 0.933), blob(uv, c1, 0.55) * 0.70);
   col = mix(col, vec3(0.947, 0.866, 0.795), blob(uv, c2, 0.60) * 0.62);
   col = mix(col, vec3(0.810, 0.867, 0.908), blob(uv, c3, 0.40) * 0.53);
+  return col;
+}
+void main(){
+  vec2 dent = texture(uField, vUv).xy;
+  float t = uTime * 0.05;
+  // refraction with a slight chromatic split, like light through glass
+  vec3 col;
+  col.r = wash(vUv - dent * distort * 1.25, t).r;
+  col.g = wash(vUv - dent * distort,        t).g;
+  col.b = wash(vUv - dent * distort * 0.75, t).b;
+  // thin-film sheen: pearlescent color that lives where the dent is,
+  // trails the disturbance and melts away with it
+  float m = length(dent);
+  float film = smoothstep(0.02, 0.55, m);
+  vec3 rainbow = vec3(0.5) + 0.5 * cos(6.28318 * (m * 1.4 + vec3(0.00, 0.33, 0.67)) + uTime * 0.15);
+  vec3 sheen = mix(vec3(0.93, 0.92, 0.94), rainbow, 0.45); // pearl, not neon
+  col = mix(col, sheen, film * 0.14);
   o = vec4(col, 1.0);
 }`,
 };

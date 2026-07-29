@@ -11,11 +11,16 @@ import { useEffect, useRef } from "react";
 
 const SIM_RES = 160;
 const PRESSURE_ITERS = 22;
-const VEL_DISSIPATION = 0.42; // how fast the liquid dissolves back to rest
+const VEL_DISSIPATION = 0.58; // how fast the liquid dissolves back to rest
 const CURL = 16; // vorticity confinement — the swirl character
 const SPLAT_RADIUS = 0.012;
-const SPLAT_FORCE = 4500;
-const DISTORT = 0.0012;
+const SPLAT_FORCE = 2600;
+const DISTORT = 0.00082;
+// distortion earns its strength: a single flick barely registers, only
+// sustained movement charges the stir up to full force (lusion behavior)
+const STIR_CHARGE = 26; // how quickly continuous motion builds energy
+const STIR_DECAY = 2.6; // how quickly energy drains once the mouse rests
+const STIR_FLOOR = 0.12; // fraction of force a cold start still applies
 
 const VERT = `#version 300 es
 precision highp float;
@@ -250,11 +255,12 @@ export default function FluidSim() {
     };
 
     // a gentle wake-up stir so the page is alive before the first move
-    splatVelocity(0.6, 0.6, 220, -140);
-    splatVelocity(0.35, 0.4, -180, 160);
+    splatVelocity(0.6, 0.6, 150, -95);
+    splatVelocity(0.35, 0.4, -120, 110);
 
     let last = performance.now();
     let ambient = 0;
+    let stir = 0; // 0..1 energy from sustained pointer movement
     let lastScroll = window.scrollY;
     let raf = 0;
     const t0 = performance.now();
@@ -263,20 +269,23 @@ export default function FluidSim() {
       const dt = Math.min((now - last) / 1000, 0.033);
       last = now;
 
+      stir = Math.max(0, stir - stir * STIR_DECAY * dt);
       if (pointer.moved) {
         pointer.moved = false;
         const dx = pointer.x - pointer.px;
         const dy = pointer.y - pointer.py;
         const dist = Math.hypot(dx, dy);
         if (dist > 0.0003) {
+          stir = Math.min(1, stir + dist * STIR_CHARGE);
+          const force = SPLAT_FORCE * (STIR_FLOOR + (1 - STIR_FLOOR) * stir);
           const steps = Math.min(14, Math.max(1, Math.ceil(dist * 140)));
           for (let i = 1; i <= steps; i++) {
             const t = i / steps;
             splatVelocity(
               pointer.px + dx * t,
               pointer.py + dy * t,
-              (dx * SPLAT_FORCE) / steps,
-              (dy * SPLAT_FORCE) / steps,
+              (dx * force) / steps,
+              (dy * force) / steps,
             );
           }
         }
@@ -289,7 +298,7 @@ export default function FluidSim() {
       const sv = (scrollNow - lastScroll) / window.innerHeight;
       lastScroll = scrollNow;
       if (Math.abs(sv) > 0.002) {
-        const s = Math.max(-160, Math.min(160, sv * 2400));
+        const s = Math.max(-100, Math.min(100, sv * 1500));
         for (let n = 0; n < 3; n++) {
           splatVelocity(
             0.2 + 0.3 * n + 0.05 * Math.sin(now / 700 + n * 2.1),
@@ -302,13 +311,13 @@ export default function FluidSim() {
 
       // ambient life every few seconds so the liquid never fully dies
       ambient += dt;
-      if (ambient > 3.4) {
+      if (ambient > 5.2) {
         ambient = 0;
         splatVelocity(
           0.2 + Math.random() * 0.6,
           0.2 + Math.random() * 0.6,
-          (Math.random() - 0.5) * 240,
-          (Math.random() - 0.5) * 240,
+          (Math.random() - 0.5) * 150,
+          (Math.random() - 0.5) * 150,
         );
       }
 

@@ -44,16 +44,16 @@ export default function GitLog() {
       ([e]) => {
         if (e.isIntersecting && !timer) {
           io.disconnect();
-          // 2-4 chars every 24ms — streaming speed, with a little jitter
+          // 1-2 chars every 28ms — a calmer typing pace, with a little jitter
           timer = setInterval(() => {
             setChars((c) => {
               if (c > total) {
                 if (timer) clearInterval(timer);
                 return c;
               }
-              return c + 2 + Math.floor(Math.random() * 3);
+              return c + 1 + (Math.random() < 0.4 ? 1 : 0);
             });
-          }, 24);
+          }, 28);
         }
       },
       { threshold: 0.3 },

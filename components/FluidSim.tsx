@@ -11,11 +11,11 @@ import { useEffect, useRef } from "react";
 
 const SIM_RES = 160;
 const PRESSURE_ITERS = 22;
-const VEL_DISSIPATION = 0.58; // how fast the liquid dissolves back to rest
-const CURL = 16; // vorticity confinement — the swirl character
-const SPLAT_RADIUS = 0.012;
+const VEL_DISSIPATION = 0.72; // heavy damping: motion creeps, then dies close by
+const CURL = 4; // near-zero swirl — thick oil moves laminar, not turbulent
+const SPLAT_RADIUS = 0.007; // tight footprint, the stir stays near the cursor
 const SPLAT_FORCE = 2600;
-const DISTORT = 0.00082;
+const DISTORT = 0.0016; // denser warp inside the smaller footprint
 // distortion earns its strength: a single flick barely registers, only
 // sustained movement charges the stir up to full force (lusion behavior)
 const STIR_CHARGE = 26; // how quickly continuous motion builds energy

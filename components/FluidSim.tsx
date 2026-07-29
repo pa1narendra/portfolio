@@ -14,10 +14,10 @@ import { useEffect, useRef } from "react";
 const SIM_RES = 160;
 // the surface is a damped wave membrane: a disturbance detaches from the
 // cursor and travels on its own physics — blooming, interfering, melting.
-const WAVE_SPEED = 26; // texels/s — how fast a disturbance travels (slow = thick)
+const WAVE_SPEED = 18; // texels/s — how fast a disturbance travels (slow = thick)
 const VEL_DAMP = 1.25; // 1/s — the oil eats the wave's energy
 const DENT_DECAY = 0.5; // 1/s — the surface itself pulls flat
-const SPLAT_RADIUS = 0.006; // disturbance width at the point of contact
+const SPLAT_RADIUS = 0.003; // disturbance width at the point of contact (~70% of before)
 const SPLAT_PUSH = 6.5; // dent strength per unit of pointer motion
 const MAX_DENT = 1.0; // hard cap on field magnitude — oil never overshoots
 const DISTORT = 0.016; // max warp at full dent, a small fraction of the screen

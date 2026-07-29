@@ -12,9 +12,12 @@ import { useEffect, useRef } from "react";
 // Desktop-only; reduced-motion and touch devices keep the static washes.
 
 const SIM_RES = 160;
-const DECAY = 1.5; // 1/s — the trail lingers a moment, then pulls flat
-const DIFFUSE = 0.22; // how much a dent oozes into its neighbors per frame
-const SPLAT_RADIUS = 0.006; // trail width, a little wider than the cursor
+// the surface is a damped wave membrane: a disturbance detaches from the
+// cursor and travels on its own physics — blooming, interfering, melting.
+const WAVE_SPEED = 26; // texels/s — how fast a disturbance travels (slow = thick)
+const VEL_DAMP = 1.25; // 1/s — the oil eats the wave's energy
+const DENT_DECAY = 0.5; // 1/s — the surface itself pulls flat
+const SPLAT_RADIUS = 0.006; // disturbance width at the point of contact
 const SPLAT_PUSH = 6.5; // dent strength per unit of pointer motion
 const MAX_DENT = 1.0; // hard cap on field magnitude — oil never overshoots
 const DISTORT = 0.016; // max warp at full dent, a small fraction of the screen
@@ -30,6 +33,7 @@ out vec2 vUv;
 void main(){ vUv = aPos*0.5+0.5; gl_Position = vec4(aPos,0.,1.); }`;
 
 const FRAG = {
+  // adds a disturbance while preserving the wave's velocity channels
   splat: `#version 300 es
 precision highp float;
 in vec2 vUv; out vec4 o;
@@ -37,25 +41,28 @@ uniform sampler2D uTarget; uniform float aspect; uniform vec3 color; uniform vec
 void main(){
   vec2 p = vUv - point; p.x *= aspect;
   vec3 splat = exp(-dot(p,p)/radius) * color;
-  o = vec4(texture(uTarget, vUv).xyz + splat, 1.);
+  o = texture(uTarget, vUv) + vec4(splat.xy, 0., 0.);
 }`,
-  // the whole "physics": blur a little (ooze), decay a lot (density),
-  // clamp (thick oil cannot be whipped up). Nothing is transported.
-  relax: `#version 300 es
+  // the physics: a damped vector wave equation. xy = surface displacement,
+  // zw = its velocity. A disturbance propagates outward on its own,
+  // interferes with itself, and is eaten by the oil's damping. Nothing
+  // follows the cursor — the cursor only plants the disturbance.
+  wave: `#version 300 es
 precision highp float;
 in vec2 vUv; out vec4 o;
-uniform sampler2D uField; uniform vec2 texelSize; uniform float decay; uniform float diffuse; uniform float dt; uniform float maxDent;
+uniform sampler2D uField; uniform vec2 texelSize; uniform float dt; uniform float c2; uniform float velDamp; uniform float decay; uniform float maxDent;
 void main(){
-  vec2 C = texture(uField, vUv).xy;
+  vec4 C = texture(uField, vUv);
   vec2 L = texture(uField, vUv - vec2(texelSize.x,0.)).xy;
   vec2 R = texture(uField, vUv + vec2(texelSize.x,0.)).xy;
   vec2 B = texture(uField, vUv - vec2(0.,texelSize.y)).xy;
   vec2 T = texture(uField, vUv + vec2(0.,texelSize.y)).xy;
-  vec2 oozed = mix(C, (L+R+B+T)*0.25, diffuse);
-  vec2 settled = oozed * exp(-decay*dt);
-  float m = length(settled);
-  if (m > maxDent) settled *= maxDent / m;
-  o = vec4(settled, 0., 1.);
+  vec2 lap = L + R + B + T - 4.0 * C.xy;
+  vec2 vel = (C.zw + lap * c2 * dt) * exp(-velDamp * dt);
+  vec2 dent = (C.xy + vel * dt) * exp(-decay * dt);
+  float m = length(dent);
+  if (m > maxDent) dent *= maxDent / m;
+  o = vec4(dent, vel);
 }`,
   // the visible part: the dent field refracts the wash with a slight
   // chromatic split, and where the surface is disturbed a thin oil-film
@@ -92,7 +99,7 @@ void main(){
   // thin-film sheen: pearlescent color that lives where the dent is,
   // trails the disturbance and melts away with it
   float m = length(dent);
-  float film = smoothstep(0.02, 0.55, m);
+  float film = smoothstep(0.006, 0.4, m);
   vec3 rainbow = vec3(0.5) + 0.5 * cos(6.28318 * (m * 1.4 + vec3(0.00, 0.33, 0.67)) + uTime * 0.15);
   vec3 sheen = mix(vec3(0.93, 0.92, 0.94), rainbow, 0.45); // pearl, not neon
   col = mix(col, sheen, film * 0.14);
@@ -150,7 +157,7 @@ export default function FluidSim() {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RG16F, w, h, 0, gl.RG, gl.HALF_FLOAT, null);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, w, h, 0, gl.RGBA, gl.HALF_FLOAT, null);
       const fb = gl.createFramebuffer()!;
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
       gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
@@ -260,13 +267,14 @@ export default function FluidSim() {
         smooth.py = smooth.y;
       }
 
-      // the only ongoing process: the oil settling back to flat
-      const pr = programs.relax;
+      // the ongoing physics: the wave travels, interferes, and dies out
+      const pr = programs.wave;
       gl.useProgram(pr.p);
       gl.uniform2f(pr.u.texelSize, 1 / simW, 1 / simH);
-      gl.uniform1f(pr.u.decay, DECAY);
-      gl.uniform1f(pr.u.diffuse, DIFFUSE);
       gl.uniform1f(pr.u.dt, dt);
+      gl.uniform1f(pr.u.c2, WAVE_SPEED * WAVE_SPEED);
+      gl.uniform1f(pr.u.velDamp, VEL_DAMP);
+      gl.uniform1f(pr.u.decay, DENT_DECAY);
       gl.uniform1f(pr.u.maxDent, MAX_DENT);
       bindTex(pr.u.uField, field.read.tex, 0);
       blit(field.write);

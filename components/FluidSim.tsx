@@ -2,25 +2,26 @@
 
 import { useEffect, useRef } from "react";
 
-// A real fluid simulation behind the page. Stir with the cursor and the
-// liquid keeps moving — it swirls with momentum, then slowly dissolves
-// back to calm. Rendering is displacement-only: the velocity field warps
-// the smooth pastel gradient, and nothing derivative (curl, magnitude
-// shading) is ever drawn, so the sim grid can't print artifacts.
+// A small pond of very thick oil behind the page. This is deliberately NOT
+// a water simulation: there is no advection, no pressure, no vorticity, so
+// a disturbance can never become a current or a little cyclone. The cursor
+// dents a displacement field, the dent oozes outward a touch (diffusion),
+// and density pulls it flat again (decay). Nothing moves unless you move.
+// Rendering is displacement-only: the field warps the pastel gradient and
+// nothing at simulation resolution is ever drawn directly.
 // Desktop-only; reduced-motion and touch devices keep the static washes.
 
 const SIM_RES = 160;
-const PRESSURE_ITERS = 22;
-const VEL_DISSIPATION = 0.72; // heavy damping: motion creeps, then dies close by
-const CURL = 4; // near-zero swirl — thick oil moves laminar, not turbulent
-const SPLAT_RADIUS = 0.007; // tight footprint, the stir stays near the cursor
-const SPLAT_FORCE = 2600;
-const DISTORT = 0.0016; // denser warp inside the smaller footprint
-// distortion earns its strength: a single flick barely registers, only
-// sustained movement charges the stir up to full force (lusion behavior)
-const STIR_CHARGE = 26; // how quickly continuous motion builds energy
-const STIR_DECAY = 2.6; // how quickly energy drains once the mouse rests
-const STIR_FLOOR = 0.12; // fraction of force a cold start still applies
+const DECAY = 2.0; // 1/s — how fast the oil pulls itself flat again
+const DIFFUSE = 0.24; // how much a dent oozes into its neighbors per frame
+const SPLAT_RADIUS = 0.0045; // the dent is barely wider than the cursor
+const SPLAT_PUSH = 5.5; // dent strength per unit of pointer motion
+const MAX_DENT = 1.0; // hard cap on field magnitude — oil never overshoots
+const DISTORT = 0.011; // max warp at full dent, a small fraction of the screen
+// the dent charges with sustained movement: a flick barely marks the surface
+const STIR_CHARGE = 22;
+const STIR_DECAY = 3.0;
+const STIR_FLOOR = 0.18;
 
 const VERT = `#version 300 es
 precision highp float;
@@ -38,89 +39,38 @@ void main(){
   vec3 splat = exp(-dot(p,p)/radius) * color;
   o = vec4(texture(uTarget, vUv).xyz + splat, 1.);
 }`,
-  advect: `#version 300 es
+  // the whole "physics": blur a little (ooze), decay a lot (density),
+  // clamp (thick oil cannot be whipped up). Nothing is transported.
+  relax: `#version 300 es
 precision highp float;
 in vec2 vUv; out vec4 o;
-uniform sampler2D uVelocity; uniform sampler2D uSource; uniform vec2 texelSize; uniform float dt; uniform float dissipation;
+uniform sampler2D uField; uniform vec2 texelSize; uniform float decay; uniform float diffuse; uniform float dt; uniform float maxDent;
 void main(){
-  vec2 coord = vUv - dt * texture(uVelocity, vUv).xy * texelSize;
-  o = texture(uSource, coord) / (1. + dissipation * dt);
+  vec2 C = texture(uField, vUv).xy;
+  vec2 L = texture(uField, vUv - vec2(texelSize.x,0.)).xy;
+  vec2 R = texture(uField, vUv + vec2(texelSize.x,0.)).xy;
+  vec2 B = texture(uField, vUv - vec2(0.,texelSize.y)).xy;
+  vec2 T = texture(uField, vUv + vec2(0.,texelSize.y)).xy;
+  vec2 oozed = mix(C, (L+R+B+T)*0.25, diffuse);
+  vec2 settled = oozed * exp(-decay*dt);
+  float m = length(settled);
+  if (m > maxDent) settled *= maxDent / m;
+  o = vec4(settled, 0., 1.);
 }`,
-  divergence: `#version 300 es
-precision highp float;
-in vec2 vUv; out vec4 o;
-uniform sampler2D uVelocity; uniform vec2 texelSize;
-void main(){
-  float L = texture(uVelocity, vUv - vec2(texelSize.x,0.)).x;
-  float R = texture(uVelocity, vUv + vec2(texelSize.x,0.)).x;
-  float B = texture(uVelocity, vUv - vec2(0.,texelSize.y)).y;
-  float T = texture(uVelocity, vUv + vec2(0.,texelSize.y)).y;
-  o = vec4(0.5*(R-L+T-B),0.,0.,1.);
-}`,
-  curl: `#version 300 es
-precision highp float;
-in vec2 vUv; out vec4 o;
-uniform sampler2D uVelocity; uniform vec2 texelSize;
-void main(){
-  float L = texture(uVelocity, vUv - vec2(texelSize.x,0.)).y;
-  float R = texture(uVelocity, vUv + vec2(texelSize.x,0.)).y;
-  float B = texture(uVelocity, vUv - vec2(0.,texelSize.y)).x;
-  float T = texture(uVelocity, vUv + vec2(0.,texelSize.y)).x;
-  o = vec4(0.5*(R-L-T+B),0.,0.,1.);
-}`,
-  vorticity: `#version 300 es
-precision highp float;
-in vec2 vUv; out vec4 o;
-uniform sampler2D uVelocity; uniform sampler2D uCurl; uniform vec2 texelSize; uniform float curl; uniform float dt;
-void main(){
-  float L = texture(uCurl, vUv - vec2(texelSize.x,0.)).x;
-  float R = texture(uCurl, vUv + vec2(texelSize.x,0.)).x;
-  float B = texture(uCurl, vUv - vec2(0.,texelSize.y)).x;
-  float T = texture(uCurl, vUv + vec2(0.,texelSize.y)).x;
-  float C = texture(uCurl, vUv).x;
-  vec2 force = 0.5*vec2(abs(T)-abs(B), abs(R)-abs(L));
-  force /= length(force)+1e-4; force *= curl*C; force.y *= -1.;
-  vec2 vel = texture(uVelocity, vUv).xy + force*dt;
-  o = vec4(clamp(vel,-1000.,1000.),0.,1.);
-}`,
-  pressure: `#version 300 es
-precision highp float;
-in vec2 vUv; out vec4 o;
-uniform sampler2D uPressure; uniform sampler2D uDivergence; uniform vec2 texelSize;
-void main(){
-  float L = texture(uPressure, vUv - vec2(texelSize.x,0.)).x;
-  float R = texture(uPressure, vUv + vec2(texelSize.x,0.)).x;
-  float B = texture(uPressure, vUv - vec2(0.,texelSize.y)).x;
-  float T = texture(uPressure, vUv + vec2(0.,texelSize.y)).x;
-  float div = texture(uDivergence, vUv).x;
-  o = vec4((L+R+B+T-div)*0.25,0.,0.,1.);
-}`,
-  gradient: `#version 300 es
-precision highp float;
-in vec2 vUv; out vec4 o;
-uniform sampler2D uPressure; uniform sampler2D uVelocity; uniform vec2 texelSize;
-void main(){
-  float L = texture(uPressure, vUv - vec2(texelSize.x,0.)).x;
-  float R = texture(uPressure, vUv + vec2(texelSize.x,0.)).x;
-  float B = texture(uPressure, vUv - vec2(0.,texelSize.y)).x;
-  float T = texture(uPressure, vUv + vec2(0.,texelSize.y)).x;
-  vec2 vel = texture(uVelocity, vUv).xy - vec2(R-L,T-B);
-  o = vec4(vel,0.,1.);
-}`,
-  // pure displacement of the pastel field — no curl or magnitude shading,
-  // so nothing at simulation resolution is ever directly visible
+  // pure displacement of the pastel field — no derivative shading, so the
+  // sim grid can never print artifacts
   display: `#version 300 es
 precision highp float;
 in vec2 vUv; out vec4 o;
-uniform sampler2D uVelocity;
+uniform sampler2D uField;
 uniform float uTime; uniform float aspect; uniform float distort;
 float blob(vec2 uv, vec2 c, float r){
   vec2 d = uv - c; d.x *= aspect;
   return smoothstep(r, 0.0, length(d));
 }
 void main(){
-  vec2 vel = texture(uVelocity, vUv).xy;
-  vec2 uv = vUv - vel * distort;
+  vec2 dent = texture(uField, vUv).xy;
+  vec2 uv = vUv - dent * distort;
   float t = uTime * 0.05;
   vec2 c1 = vec2(0.13 + 0.05*sin(t),      0.84 + 0.04*cos(t*0.8));
   vec2 c2 = vec2(0.88 + 0.06*cos(t*0.7),  0.14 + 0.05*sin(t*0.9));
@@ -176,14 +126,14 @@ export default function FluidSim() {
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
 
     type FBO = { fb: WebGLFramebuffer; tex: WebGLTexture; w: number; h: number };
-    const createFBO = (w: number, h: number, internal: number, format: number): FBO => {
+    const createFBO = (w: number, h: number): FBO => {
       const tex = gl.createTexture()!;
       gl.bindTexture(gl.TEXTURE_2D, tex);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texImage2D(gl.TEXTURE_2D, 0, internal, w, h, 0, format, gl.HALF_FLOAT, null);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RG16F, w, h, 0, gl.RG, gl.HALF_FLOAT, null);
       const fb = gl.createFramebuffer()!;
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
       gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
@@ -191,24 +141,18 @@ export default function FluidSim() {
       gl.clear(gl.COLOR_BUFFER_BIT);
       return { fb, tex, w, h };
     };
-    const doubleFBO = (w: number, h: number, internal: number, format: number) => {
-      let a = createFBO(w, h, internal, format);
-      let b = createFBO(w, h, internal, format);
-      return {
-        get read() { return a; },
-        get write() { return b; },
-        swap() { const t = a; a = b; b = t; },
-      };
+
+    const simW = SIM_RES;
+    const simH = Math.max(32, Math.round(SIM_RES / (window.innerWidth / window.innerHeight)));
+    let a = createFBO(simW, simH);
+    let b = createFBO(simW, simH);
+    const field = {
+      get read() { return a; },
+      get write() { return b; },
+      swap() { const t = a; a = b; b = t; },
     };
 
     const aspect = () => canvas.width / canvas.height;
-    const simW = SIM_RES;
-    const simH = Math.max(32, Math.round(SIM_RES / (window.innerWidth / window.innerHeight)));
-
-    const velocity = doubleFBO(simW, simH, gl.RG16F, gl.RG);
-    const pressure = doubleFBO(simW, simH, gl.R16F, gl.RED);
-    const divergence = createFBO(simW, simH, gl.R16F, gl.RED);
-    const curlFBO = createFBO(simW, simH, gl.R16F, gl.RED);
 
     const blit = (target: FBO | null) => {
       if (target) {
@@ -233,7 +177,6 @@ export default function FluidSim() {
     resize();
     window.addEventListener("resize", resize);
 
-    // continuous stirring: forces laid along the cursor's path each frame
     const pointer = { x: 0.5, y: 0.5, px: 0.5, py: 0.5, moved: false };
     const onMove = (e: PointerEvent) => {
       pointer.x = e.clientX / window.innerWidth;
@@ -242,26 +185,20 @@ export default function FluidSim() {
     };
     window.addEventListener("pointermove", onMove);
 
-    const splatVelocity = (x: number, y: number, dx: number, dy: number) => {
+    const dent = (x: number, y: number, dx: number, dy: number) => {
       const sp = programs.splat;
       gl.useProgram(sp.p);
       gl.uniform1f(sp.u.aspect, aspect());
       gl.uniform2f(sp.u.point, x, y);
       gl.uniform1f(sp.u.radius, SPLAT_RADIUS);
-      bindTex(sp.u.uTarget, velocity.read.tex, 0);
+      bindTex(sp.u.uTarget, field.read.tex, 0);
       gl.uniform3f(sp.u.color, dx, dy, 0);
-      blit(velocity.write);
-      velocity.swap();
+      blit(field.write);
+      field.swap();
     };
 
-    // a gentle wake-up stir so the page is alive before the first move
-    splatVelocity(0.6, 0.6, 150, -95);
-    splatVelocity(0.35, 0.4, -120, 110);
-
     let last = performance.now();
-    let ambient = 0;
     let stir = 0; // 0..1 energy from sustained pointer movement
-    let lastScroll = window.scrollY;
     let raf = 0;
     const t0 = performance.now();
 
@@ -277,15 +214,15 @@ export default function FluidSim() {
         const dist = Math.hypot(dx, dy);
         if (dist > 0.0003) {
           stir = Math.min(1, stir + dist * STIR_CHARGE);
-          const force = SPLAT_FORCE * (STIR_FLOOR + (1 - STIR_FLOOR) * stir);
-          const steps = Math.min(14, Math.max(1, Math.ceil(dist * 140)));
+          const push = SPLAT_PUSH * (STIR_FLOOR + (1 - STIR_FLOOR) * stir);
+          const steps = Math.min(10, Math.max(1, Math.ceil(dist * 120)));
           for (let i = 1; i <= steps; i++) {
             const t = i / steps;
-            splatVelocity(
+            dent(
               pointer.px + dx * t,
               pointer.py + dy * t,
-              (dx * force) / steps,
-              (dy * force) / steps,
+              (dx / dist) * push * Math.min(dist * 8, 1),
+              (dy / dist) * push * Math.min(dist * 8, 1),
             );
           }
         }
@@ -293,92 +230,24 @@ export default function FluidSim() {
         pointer.py = pointer.y;
       }
 
-      // scrolling stirs the liquid too
-      const scrollNow = window.scrollY;
-      const sv = (scrollNow - lastScroll) / window.innerHeight;
-      lastScroll = scrollNow;
-      if (Math.abs(sv) > 0.002) {
-        const s = Math.max(-100, Math.min(100, sv * 1500));
-        for (let n = 0; n < 3; n++) {
-          splatVelocity(
-            0.2 + 0.3 * n + 0.05 * Math.sin(now / 700 + n * 2.1),
-            0.35 + 0.3 * Math.sin(now / 900 + n),
-            (n - 1) * 30,
-            s,
-          );
-        }
-      }
-
-      // ambient life every few seconds so the liquid never fully dies
-      ambient += dt;
-      if (ambient > 5.2) {
-        ambient = 0;
-        splatVelocity(
-          0.2 + Math.random() * 0.6,
-          0.2 + Math.random() * 0.6,
-          (Math.random() - 0.5) * 150,
-          (Math.random() - 0.5) * 150,
-        );
-      }
-
-      const texel: [number, number] = [1 / simW, 1 / simH];
-
-      let pr = programs.curl;
+      // the only ongoing process: the oil settling back to flat
+      const pr = programs.relax;
       gl.useProgram(pr.p);
-      gl.uniform2f(pr.u.texelSize, ...texel);
-      bindTex(pr.u.uVelocity, velocity.read.tex, 0);
-      blit(curlFBO);
-
-      pr = programs.vorticity;
-      gl.useProgram(pr.p);
-      gl.uniform2f(pr.u.texelSize, ...texel);
-      gl.uniform1f(pr.u.curl, CURL);
+      gl.uniform2f(pr.u.texelSize, 1 / simW, 1 / simH);
+      gl.uniform1f(pr.u.decay, DECAY);
+      gl.uniform1f(pr.u.diffuse, DIFFUSE);
       gl.uniform1f(pr.u.dt, dt);
-      bindTex(pr.u.uVelocity, velocity.read.tex, 0);
-      bindTex(pr.u.uCurl, curlFBO.tex, 1);
-      blit(velocity.write);
-      velocity.swap();
+      gl.uniform1f(pr.u.maxDent, MAX_DENT);
+      bindTex(pr.u.uField, field.read.tex, 0);
+      blit(field.write);
+      field.swap();
 
-      pr = programs.divergence;
-      gl.useProgram(pr.p);
-      gl.uniform2f(pr.u.texelSize, ...texel);
-      bindTex(pr.u.uVelocity, velocity.read.tex, 0);
-      blit(divergence);
-
-      pr = programs.pressure;
-      gl.useProgram(pr.p);
-      gl.uniform2f(pr.u.texelSize, ...texel);
-      bindTex(pr.u.uDivergence, divergence.tex, 1);
-      for (let i = 0; i < PRESSURE_ITERS; i++) {
-        bindTex(pr.u.uPressure, pressure.read.tex, 0);
-        blit(pressure.write);
-        pressure.swap();
-      }
-
-      pr = programs.gradient;
-      gl.useProgram(pr.p);
-      gl.uniform2f(pr.u.texelSize, ...texel);
-      bindTex(pr.u.uPressure, pressure.read.tex, 0);
-      bindTex(pr.u.uVelocity, velocity.read.tex, 1);
-      blit(velocity.write);
-      velocity.swap();
-
-      pr = programs.advect;
-      gl.useProgram(pr.p);
-      gl.uniform2f(pr.u.texelSize, ...texel);
-      gl.uniform1f(pr.u.dt, dt);
-      gl.uniform1f(pr.u.dissipation, VEL_DISSIPATION);
-      bindTex(pr.u.uVelocity, velocity.read.tex, 0);
-      bindTex(pr.u.uSource, velocity.read.tex, 0);
-      blit(velocity.write);
-      velocity.swap();
-
-      pr = programs.display;
-      gl.useProgram(pr.p);
-      gl.uniform1f(pr.u.uTime, (now - t0) / 1000);
-      gl.uniform1f(pr.u.aspect, aspect());
-      gl.uniform1f(pr.u.distort, DISTORT);
-      bindTex(pr.u.uVelocity, velocity.read.tex, 0);
+      const dp = programs.display;
+      gl.useProgram(dp.p);
+      gl.uniform1f(dp.u.uTime, (now - t0) / 1000);
+      gl.uniform1f(dp.u.aspect, aspect());
+      gl.uniform1f(dp.u.distort, DISTORT);
+      bindTex(dp.u.uField, field.read.tex, 0);
       blit(null);
 
       raf = requestAnimationFrame(frame);
